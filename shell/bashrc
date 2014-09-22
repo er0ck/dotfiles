@@ -1,0 +1,64 @@
+# .bashrc
+
+### Get os name via uname ###
+_myos="$(uname)"
+
+# Test for an interactive shell.  There is no need to set anything
+# past this point for scp and rcp, and it's important to refrain from
+# outputting anything in those cases.
+if [[ $- != *i* ]] ; then
+	# Shell is non-interactive.  Be done now
+  echo "non-interactive shell"
+	return
+fi
+
+# osx 
+[[ -f /opt/local/etc/profile.d/bash_completion.sh ]] && source /opt/local/etc/profile.d/bash_completion.sh
+# linux
+[[ -f /etc/profile.d/bash-completion ]] && source /etc/profile.d/bash-completion
+
+[[ -f ~/dotfiles/shell/bashrc.git-completion ]] && source ~/dotfiles/shell/bashrc.git-completion
+[[ -f ~/dotfiles/shell/aliases ]] && source ~/dotfiles/shell/aliases
+
+export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
+
+# less syntax highlighting osx path here
+export LESSOPEN="| /opt/local/bin/src-hilite-lesspipe.sh %s"
+# Less options:
+# -i : ignore case in searches (unless searching with caps like vim)
+# -M : long prompt (???)
+# -S : don't wrap long lines
+# -x4 : Display tab characters as 4 spaces
+# -R : Pass through color control codes (allows display of colors)
+# -X : Don't init/deinit terminal (leave display on screen on exit)
+# -F : automatically exit if display fits entirely on one screen
+export LESS="-iMRX -x4"
+
+#fix minor typos for cd
+shopt -s cdspell
+
+# append history when you exit shell to .bash_history
+shopt -s histappend
+# By default up/down are bound to previous-history
+# and next-history respectively. The following does the
+# same but gives the extra functionality where if you
+# type any text (or more accurately, if there is any text
+# between the start of the line and the cursor),
+# the subset of the history starting with that text
+# is searched (like 4dos for e.g.).
+# Note to get rid of a line just Ctrl-C
+#"\e[B": history-search-forward
+#"\e[A": history-search-backward
+bind '"\e[A"':history-search-backward
+bind '"\e[B"':history-search-forward
+HISTCONTROL=erasedups
+HISTSIZE=10000
+HISTIGNORE="&:ls:ls *:[bf]g:exit:cd:cd -:pwd:cd ..:..:...:ll:la"
+EDITOR=vim
+MANPAGER="less -X"
+export HISTCONTROL HISTSIZE HISTIGNORE EDITOR MANPAGER
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history
+#export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
