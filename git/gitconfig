@@ -4,7 +4,15 @@
 [user]
 	name = Eric Thompson
 	email = eric.thompson@puppetlabs.com
+[color]
+  # color opts: normal, black, red, green, yellow, blue, magenta, cyan, or white
+  ui = auto
+  interactive = auto
 [core]
 	excludesfile = ~/dotfiles/git/gitignore_global
+[credential]
+    helper = osxkeychain
 [init]
 	templatedir = ~/dotfiles/git/git_template
+[alias]
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
