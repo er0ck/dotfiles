@@ -1,0 +1,91 @@
+call pathogen#infect()
+call pathogen#helptags()
+
+filetype on " Automatically detect file types.
+let mapleader=","  " change <leader> to ,
+
+" theme
+set background=dark
+let g:solarized_termtrans=1
+let g:solarized_termcolors=256
+"let g:solarized_contrast="high"
+"let g:solarized_visibility="high"
+colorscheme solarized
+
+"Hide abandon buffers in order to not lose undo history.
+set hid
+" autosave buffers when switching buffers
+set autowrite
+set noerrorbells " No noise.
+set mousehide " hide mouse after typing
+set guifont=Monaco:h12
+" turn on syntax highlighting
+filetype plugin indent on 
+syntax on
+" autotab/indent stuff
+" expandtab?
+"set et
+set autoindent
+" erase previously entered chars, autoindent and newlines 
+set backspace=indent,eol,start
+"set smarttab
+"set smartindent
+"set indentexpr
+set tabstop=2
+set shiftwidth=2
+set expandtab 
+" show matching brace/paren
+set showmatch
+" autoindent perl only
+"autocmd FileType perl set autoindent|set smartindent
+" make tab in v mode ident code
+"vmap <tab> >gv
+"vmap <s-tab> <gv
+" make tab in normal mode ident code
+"nmap <tab> I<tab><esc>
+"nmap <s-tab> ^i<bs><esc>
+
+" tagbar stuff for ruby
+let g:tagbar_type_ruby = {
+    \ 'kinds' : [
+        \ 'm:modules',
+        \ 'c:classes',
+        \ 'd:describes',
+        \ 'C:contexts',
+        \ 'f:methods',
+        \ 'F:singleton methods'
+    \ ]
+\ }
+
+" turn off old bugs/limits
+set nocompatible
+" map F2 key to paste-mode toggle and set status
+nnoremap <F2> :set invpaste paste?<CR>
+imap <F2> <C-O><F2>
+set pastetoggle=<F2>
+" dont use Q for Ex mode
+"map Q :q
+"map q :q
+
+" show line nums, etc
+"set ruler
+" always show statusbar
+set laststatus=2
+set statusline=%<%f\ %h%m%r\ %y%=%{v:register}\ %-14.(%l,%c%V%)\ %P
+" show linenumbers on left
+set number
+" start searching before enter
+set incsearch
+set smartcase " use case sensitive when caps used
+set hlsearch  " highlight search
+" alt left and right for buffer up/dn
+:nmap <M-Left> :bprev<CR>
+:nmap <M-Right> :bnext<CR>
+
+" vimdiff settings
+" fill in space btwn lines to align buffers:
+set diffopt=filler
+" ignore whitespace
+set diffopt+=iwhite
+nmap <F8> :TagbarToggle<CR> " 
+map <C-n> :NERDTreeToggle<CR> " ctrl-n for nerdtree
