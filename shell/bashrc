@@ -53,7 +53,7 @@ bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
 HISTCONTROL=erasedups
 HISTSIZE=10000
-HISTIGNORE="&:ls:ls *:[bf]g:exit:cd:cd -:pwd:cd ..:..:...:ll:la"
+HISTIGNORE="&:ls:[bf]g:exit:cd:cd -:pwd:cd ..:..:...:ll:la"
 EDITOR=vim
 MANPAGER="less -X"
 export HISTCONTROL HISTSIZE HISTIGNORE EDITOR MANPAGER

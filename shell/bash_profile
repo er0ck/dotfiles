@@ -2,6 +2,7 @@
 export PATH=.bundle/bin:/opt/local/bin:/opt/local/sbin:$PATH
 export BUNDLE_PATH=.bundle/
 export BUNDLE_BIN=.bundle/bin
+export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
 
 #This file is sourced by bash when you log in interactively.
 [ -f ~/dotfiles/shell/bashrc ] && source ~/dotfiles/shell/bashrc
@@ -26,56 +27,68 @@ export DISPLAY
 
 # Load in the git branch prompt script.
 [ -f ~/dotfiles/shell/git_prompt  ] && source ~/dotfiles/shell/git_prompt
-#[ -f ~/dotfiles/shell/bash_prompt ] && source ~/dotfiles/shell/bash_prompt
 
+export GIT_PS1_SHOWDIRTYSTATE=true
 set_prompt () {
   Last_Command=$? # Must come first!
-  local black=""
-  local blue=""
-  local bold=""
-  local cyan=""
-  local green=""
-  local orange=""
-  local purple=""
-  local red=""
-  local reset=""
-  local white=""
-  local yellow=""
-
-  local hostStyle=""
-  local userStyle=""
-
+  BOLD=""
+  RESET=""
+  BASE03=""
+  BASE02=""
+  BASE01=""
+  BASE00=""
+  BASE0=""
+  BASE1=""
+  BASE2=""
+  BASE3=""
+  YELLOW=""
+  ORANGE=""
+  RED=""
+  MAGENTA=""
+  VIOLET=""
+  BLUE=""
+  CYAN=""
+  GREEN=""
+  local HOSTSTYLE=""
+  local USERSTYLE=""
   if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    tput sgr0 # reset colors
-
-    bold=$(tput bold)
-    reset=$(tput sgr0)
-
-    # Solarized colors
-    # (https://github.com/altercation/solarized/tree/master/iterm2-colors-solarized#the-values)
-    black=$(tput setaf 0)
-    blue=$(tput setaf 33)
-    cyan=$(tput setaf 37)
-    green=$(tput setaf 64)
-    orange=$(tput setaf 166)
-    purple=$(tput setaf 125)
-    red=$(tput setaf 124)
-    white=$(tput setaf 15)
-    yellow=$(tput setaf 136)
-  else
-    bold=""
-    reset="\e[0m"
-
-    black="\e[1;30m"
-    blue="\e[1;34m"
-    cyan="\e[1;36m"
-    green="\e[1;32m"
-    orange="\e[1;33m"
-    purple="\e[1;35m"
-    red="\e[1;31m"
-    white="\e[1;37m"
-    yellow="\e[1;33m"
-  fi
+    if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
+      BASE03=$(tput setaf 234)
+      BASE02=$(tput setaf 235)
+      BASE01=$(tput setaf 240)
+      BASE00=$(tput setaf 241)
+      BASE0=$(tput setaf 244)
+      BASE1=$(tput setaf 245)
+      BASE2=$(tput setaf 254)
+      BASE3=$(tput setaf 230)
+      YELLOW=$(tput setaf 136)
+      ORANGE=$(tput setaf 166)
+      RED=$(tput setaf 160)
+      MAGENTA=$(tput setaf 125)
+      VIOLET=$(tput setaf 61)
+      BLUE=$(tput setaf 33)
+      CYAN=$(tput setaf 37)
+      GREEN=$(tput setaf 64)
+    else
+      BASE03=$(tput setaf 8)
+      BASE02=$(tput setaf 0)
+      BASE01=$(tput setaf 10)
+      BASE00=$(tput setaf 11)
+      BASE0=$(tput setaf 12)
+      BASE1=$(tput setaf 14)
+      BASE2=$(tput setaf 7)
+      BASE3=$(tput setaf 15)
+      YELLOW=$(tput setaf 3)
+      ORANGE=$(tput setaf 9)
+      RED=$(tput setaf 1)
+      MAGENTA=$(tput setaf 5)
+      VIOLET=$(tput setaf 13)
+      BLUE=$(tput setaf 4)
+      CYAN=$(tput setaf 6)
+      GREEN=$(tput setaf 2)
+    fi
+    BOLD=$(tput bold)
+    RESET=$(tput sgr0)
     FancyX='\342\234\227'
     Checkmark='\342\234\223'
 
@@ -85,25 +98,26 @@ set_prompt () {
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
     if [[ $Last_Command == 0 ]]; then
-        PS1+="$green$Checkmark "
+        PS1+="\[$GREEN\]$Checkmark "
     else
-        PS1+="$red$FancyX "
+        PS1+="\[$RED\]$FancyX "
     fi
     # If root, just print the host in red. Otherwise, print the current user
     # and host in green.
     if [[ $EUID == 0 ]]; then
-        PS1+="$red\\h "
+        PS1+="\[$RED\]\\h "
     else
-        PS1+="$green\\u@\\h "
+        PS1+="\[$GREEN\]\\u@\\h "
     fi
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
-    PS1+="$blue\\w" 
+    PS1+="\[$BLUE\]\\w" 
     GIT=$(__git_ps1)
     if (( ${#GIT} > 10 )); then
-      PS1+="\n$reset\$(__git_ps1)\\\$ "
+      PS1+="\n\[$RESET\]\$(__git_ps1)\\\$ "
     else
-      PS1+="$reset\$(__git_ps1)\\\$ "
+      PS1+="\[$RESET\]\$(__git_ps1)\\\$ "
     fi
+  fi
 }
 PROMPT_COMMAND='set_prompt'

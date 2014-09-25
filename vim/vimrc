@@ -1,8 +1,21 @@
 call pathogen#infect()
 call pathogen#helptags()
 
-filetype on " Automatically detect file types.
 let mapleader=","  " change <leader> to ,
+" turn off old bugs/limits
+set nocompatible      " We're running Vim, not Vi!
+syntax on             " Enable syntax highlighting
+filetype on           " Enable filetype detection
+filetype indent on    " Enable filetype-specific indenting
+filetype plugin on    " Enable filetype-specific plugins"
+" don't care about modula2; set all *.md as markdown
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+" setup the omnicomplete function
+set omnifunc=syntaxcomplete#Complete
+" use supertab for omnicomplete or speling based on context
+" has to be after omnicomplete configs
+let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+"let g:SuperTabDefaultCompletionType = "context"
 
 " theme
 set background=dark
@@ -19,11 +32,7 @@ set autowrite
 set noerrorbells " No noise.
 set mousehide " hide mouse after typing
 set guifont=Monaco:h12
-" turn on syntax highlighting
-filetype plugin indent on 
-syntax on
 " autotab/indent stuff
-" expandtab?
 "set et
 set autoindent
 " erase previously entered chars, autoindent and newlines 
@@ -45,6 +54,15 @@ set showmatch
 "nmap <tab> I<tab><esc>
 "nmap <s-tab> ^i<bs><esc>
 
+"" Enable folding based on syntax rules
+set foldmethod=syntax
+" default to unfolded (99 levels)
+set foldlevel=99
+"" Adjust the highlighting
+highlight Folded guibg=grey guifg=blue
+"" Map folding to Spacebar
+nnoremap <Space> za
+
 " tagbar stuff for ruby
 let g:tagbar_type_ruby = {
     \ 'kinds' : [
@@ -57,8 +75,9 @@ let g:tagbar_type_ruby = {
     \ ]
 \ }
 
-" turn off old bugs/limits
-set nocompatible
+set tags+=./tags,tags;
+set tags+=~/repos/er0ck/*/.git/tags
+
 " map F2 key to paste-mode toggle and set status
 nnoremap <F2> :set invpaste paste?<CR>
 imap <F2> <C-O><F2>
