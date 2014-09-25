@@ -1,0 +1,2 @@
+#!/bin/bash
+$*; osascript -e "display notification \"done\" with title \"$1\""
