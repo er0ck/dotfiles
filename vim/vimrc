@@ -25,6 +25,12 @@ let g:solarized_termcolors=256
 "let g:solarized_visibility="high"
 colorscheme solarized
 
+" Shortcut to rapidly toggle `set list`
+nmap <leader>l :set list!<CR>
+"
+" Use the same symbols as TextMate for tabstops and EOLs
+"set listchars=tab:▸\ ,eol:¬"
+
 "Hide abandon buffers in order to not lose undo history.
 set hid
 " autosave buffers when switching buffers

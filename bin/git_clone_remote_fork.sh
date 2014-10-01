@@ -1,4 +1,4 @@
-#!/bin/sha
+#!/bin/sh
 # eg: $1 == cfacter
 git clone https://github.com/er0ck/${1}.git
 cd ${1}

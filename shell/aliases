@@ -82,3 +82,11 @@ rmvm() {
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
 
+# force mvim to create/open empty files
+mvim () {
+  local f
+  for f; do
+    test -e "$f" || touch "$f"
+  done
+  open -a macvim "$@"
+}

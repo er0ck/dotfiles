@@ -28,7 +28,11 @@ export DISPLAY
 # Load in the git branch prompt script.
 [ -f ~/dotfiles/shell/git_prompt  ] && source ~/dotfiles/shell/git_prompt
 
+export GIT_PS1_SHOWCOLORHINTS=true
 export GIT_PS1_SHOWDIRTYSTATE=true
+export GIT_PS1_SHOWSTASHSTATE=true
+export GIT_PS1_SHOWUNTRACKEDFILES=true
+export GIT_PS1_SHOWUPSTREAM="auto"
 set_prompt () {
   Last_Command=$? # Must come first!
   BOLD=""
