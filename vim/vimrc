@@ -8,6 +8,7 @@ syntax on             " Enable syntax highlighting
 filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins"
+
 " don't care about modula2; set all *.md as markdown
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 " setup the omnicomplete function
@@ -114,3 +115,10 @@ set diffopt=filler
 set diffopt+=iwhite
 nmap <F8> :TagbarToggle<CR> " 
 map <C-n> :NERDTreeToggle<CR> " ctrl-n for nerdtree
+
+" setup hilight colorscheme for whitespace
+highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+"autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+"match ExtraWhitespace /\s\+$/  " Show trailing whitespace
+match ExtraWhitespace /\s\+\%#\@<!$/
+"match ExtraWhitespace /\t/  " Show tabs

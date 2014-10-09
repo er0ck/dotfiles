@@ -1,10 +1,10 @@
 # erict@erict.net .alias file
 #   should work in osx and linux
 #   aliases at the top, functions at bottom
-   
+
 ### Get os name via uname ###
 _myos="$(uname)"
- 
+
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
@@ -13,12 +13,12 @@ alias ~="cd ~"
 alias -- -="cd -"
 
 case $_myos in
-   Linux) 
+   Linux)
      alias ls="ls -F --color" ;;
-   Darwin) 
+   Darwin)
      alias ls="ls -F -G"
-     alias gvim=mvim 
-     alias gvimdiff=mvimdiff 
+     alias gvim=mvim
+     alias gvimdiff=mvimdiff
      # Open file in existing MacVim window
      alias gvim="open -a MacVim"
      # Show/hide hidden files in Finder
@@ -51,7 +51,7 @@ alias be="bundle exec"
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
 alias killvm='grep -oE "[0-9a-z]{15} \(.*?\)" log/latest/*-run.log | sort | uniq | awk '\''{print $1}'\'' | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""'
-alias showvm='grep -oE "[0-9a-z]{15} \(.*?\)" log/latest/*-run.log | sort | uniq'
+alias showvm="ack -oh '[0-9a-z]{15} \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq"
 alias notifybeaker='notify_done beaker'
 alias git_get_head='git rev-parse HEAD'
 
@@ -64,20 +64,20 @@ mkcd () {
   cd "$*"
 }
 # vcloud curl command one-liners
-lsvm() { 
-  curl --url http://vcloud.delivery.puppetlabs.net/vm 2> /dev/null | ruby -e 'require "json"; JSON.parse(STDIN.read).each { |vm| puts vm }' 
+lsvm() {
+  curl --url http://vcloud.delivery.puppetlabs.net/vm 2> /dev/null | ruby -e 'require "json"; JSON.parse(STDIN.read).each { |vm| puts vm }'
 }
-getvm() { 
+getvm() {
   curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[0]]["hostname"]'
 }
-sshvm() { 
-  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}" 
+sshvm() {
+  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
 }
-sshwinvm() { 
-  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}" 
+sshwinvm() {
+  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"
 }
-rmvm() { 
-  curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 
+rmvm() {
+  curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1
 }
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"

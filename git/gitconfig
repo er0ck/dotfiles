@@ -10,6 +10,7 @@
   interactive = auto
 [core]
 	excludesfile = ~/dotfiles/git/gitignore_global
+	whitespace = trailing-space,space-before-tab
 [credential]
     helper = osxkeychain
 [init]

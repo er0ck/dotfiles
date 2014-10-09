@@ -1,5 +1,5 @@
 # bash_profile
-export PATH=.bundle/bin:/opt/local/bin:/opt/local/sbin:$PATH
+export PATH=.bundle/bin:~/bin:/opt/local/bin:/opt/local/sbin:$PATH
 export BUNDLE_PATH=.bundle/
 export BUNDLE_BIN=.bundle/bin
 export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
@@ -117,7 +117,7 @@ set_prompt () {
     # the text color to the default.
     PS1+="\[$BLUE\]\\w" 
     GIT=$(__git_ps1)
-    if (( ${#GIT} > 10 )); then
+    if (( ${#GIT} > 15 )); then
       PS1+="\n\[$RESET\]\$(__git_ps1)\\\$ "
     else
       PS1+="\[$RESET\]\$(__git_ps1)\\\$ "
