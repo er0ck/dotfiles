@@ -8,7 +8,6 @@ _myos="$(uname)"
 # outputting anything in those cases.
 if [[ $- != *i* ]] ; then
 	# Shell is non-interactive.  Be done now
-  echo "non-interactive shell"
 	return
 fi
 
@@ -22,8 +21,18 @@ fi
 
 export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
 
-# less syntax highlighting osx path here
-export LESSOPEN="| /opt/local/bin/src-hilite-lesspipe.sh %s"
+case $_myos in
+  Linux)
+    # make less more friendly for non-text input files, see lesspipe(1)
+    [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+    ;;
+  Darwin)
+    # less syntax highlighting osx path here
+    export LESSOPEN="| /opt/local/bin/src-hilite-lesspipe.sh %s"
+    ;;
+  *) ;;
+esac
+
 # Less options:
 # -i : ignore case in searches (unless searching with caps like vim)
 # -M : long prompt (???)
