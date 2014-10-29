@@ -9,6 +9,7 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins"
 
+set noautochdir " force macvim to not set working dir to current file
 " don't care about modula2; set all *.md as markdown
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 " setup the omnicomplete function
@@ -69,6 +70,15 @@ set foldlevel=99
 highlight Folded guibg=grey guifg=blue
 "" Map folding to Spacebar
 nnoremap <Space> za
+
+"navigation between splits; ctrl-j, k, l, h (just like home row navigation keys)
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+" open split to right and bottom
+set splitbelow
+set splitright
 
 " tagbar stuff for ruby
 let g:tagbar_type_ruby = {

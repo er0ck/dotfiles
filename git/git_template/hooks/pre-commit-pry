@@ -1,9 +1,11 @@
 #!/bin/sh
-# Git pre-commit hook to check Ruby (*.rb/haml/coffee) files for Pry binding references
+# Git pre-commit hook to check Ruby (*.rb) files for Pry binding references
+# TODO: add /haml/coffee  file patterns?
 # based upon https://gist.github.com/lsaffie/3266940 (thanks!)
-FILES_PATTERN='\.rb(\..+)?$'
+FILES_PATTERN='\.rb$'
 FORBIDDEN='binding.pry'
 
+# TODO: xargs succeeds if no filenames matches files_pattern
 git diff --cached --name-only | \
     grep -E $FILES_PATTERN | \
     GREP_COLOR='4;5;37;41' xargs grep --color --with-filename -n $FORBIDDEN && \

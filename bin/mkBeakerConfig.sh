@@ -2,11 +2,12 @@
 # use $1 as config template; inject node names from showvm
 # TODO: add alias to host config file that gets printed in log so showvm works after mkConfig
 # TODO: find name of config file from logs
+# TODO: if no hosts found in logs, look in log for --hosts and look in there
 
 # print usage if no args
 [ $# -eq 0 ] && { echo "Usage: $0 node_config_file"; exit 1; }
 
-[ -f log/latest/*-run.log ] || { echo "no logs found"; exit 3; }
+#[ -f log/latest/*-run.log ] || { echo "no logs found"; exit 3; }
 HOSTNAMES=($(ack -oh '[0-9a-z]{15} \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $1}'))
 CONFNAMES=($(ack -oh '[0-9a-z]{15} \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $2}'))
 #echo  ${#HOSTNAMES[@]}
