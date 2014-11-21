@@ -1,7 +1,7 @@
 call pathogen#infect()
 call pathogen#helptags()
 
-let mapleader=","  " change <leader> to ,
+let mapleader=","  " change <leader> to , from \
 " turn off old bugs/limits
 set nocompatible      " We're running Vim, not Vi!
 syntax on             " Enable syntax highlighting
@@ -12,6 +12,15 @@ filetype plugin on    " Enable filetype-specific plugins"
 set noautochdir " force macvim to not set working dir to current file
 " don't care about modula2; set all *.md as markdown
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+" Set up puppet manifest and spec options
+autocmd BufNewFile,BufReadPost *.pp set filetype=puppet
+
+" disable arrow keys in escape mode
+map <up> <nop>
+map <down> <nop>
+map <left> <nop>
+map <right> <nop>
+
 " setup the omnicomplete function
 set omnifunc=syntaxcomplete#Complete
 " use supertab for omnicomplete or speling based on context
@@ -29,10 +38,10 @@ let g:solarized_termtrans=1
 let g:solarized_termcolors=256
 colorscheme solarized
 
-" Shortcut to rapidly toggle `set list`
+" Shortcut to rapidly toggle `set list` to show hidden chars
 nmap <leader>l :set list!<CR>
-"
 " Use the same symbols as TextMate for tabstops and EOLs
+" i use highlighting instead, below
 "set listchars=tab:▸\ ,eol:¬"
 
 "Hide abandon buffers in order to not lose undo history.
@@ -68,7 +77,7 @@ set showmatch
 set foldmethod=syntax
 " default to unfolded (99 levels)
 set foldlevel=99
-"" Adjust the highlighting
+"" Adjust the fold highlighting
 highlight Folded guibg=grey guifg=blue
 "" Map folding to Spacebar
 nnoremap <Space> za
@@ -134,3 +143,18 @@ highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
 "match ExtraWhitespace /\s\+$/  " Show trailing whitespace
 match ExtraWhitespace /\s\+\%#\@<!$/
 "match ExtraWhitespace /\t/  " Show tabs
+
+" StripTrailingWhitespaces and hotkey
+" from: Drew Neil (@nelstrom)
+nnoremap <silent> <F5> :call <SID>StripTrailingWhitespaces()<CR>
+function! <SID>StripTrailingWhitespaces()
+  " Preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " Do the business:
+  %s/\s\+$//e
+  " Clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
+endfunction

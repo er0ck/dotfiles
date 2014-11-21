@@ -25,7 +25,7 @@ if [ ${#HOSTNAMES[@]} -ne ${#CONFNAMES[@]} ]; then echo "problem reading log/lat
 [ -f ${1} ] || { echo "config file '${1}' not found"; exit 2; }
 cp ${1} hosts.cfg
 
-# TODO count confnames in file, if not all repla`ced, warn user
+# TODO count confnames in file, if not all replaced, warn user
 # grep  -ce '    .{15}' hosts.cfg
 
 # for CONFNAMES
@@ -33,7 +33,7 @@ i=0
 for THISCONF in "${CONFNAMES[@]}"; do
   # strip the parens
   TEMPCONF=($(echo ${THISCONF} | cut -d "(" -f 2))
-  TEMPCONF=($(echo ${TEMPCONF}     | cut -d ")" -f 1))
+  TEMPCONF=($(echo ${TEMPCONF} | cut -d ")" -f 1))
   #echo ${TEMPCONF}
   # substitute CONFNAME{i} in hosts.cfg in place with HOSTNAME{i}
   sed -i '' "s/^  ${TEMPCONF}:$/  ${HOSTNAMES[i]}:/" hosts.cfg
