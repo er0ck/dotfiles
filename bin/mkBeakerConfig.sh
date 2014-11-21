@@ -8,8 +8,10 @@
 [ $# -eq 0 ] && { echo "Usage: $0 node_config_file"; exit 1; }
 
 #[ -f log/latest/*-run.log ] || { echo "no logs found"; exit 3; }
-HOSTNAMES=($(ack -oh '[0-9a-z]{15} \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $1}'))
-CONFNAMES=($(ack -oh '[0-9a-z]{15} \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $2}'))
+# TODO: store this pattern separtely
+# TODO: combine with showvm and killvm, etc
+HOSTNAMES=($(ack -oh '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $1}'))
+CONFNAMES=($(ack -oh '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq | awk '{print $2}'))
 #echo  ${#HOSTNAMES[@]}
 #echo  ${#CONFNAMES[@]}
 

@@ -19,6 +19,10 @@ set omnifunc=syntaxcomplete#Complete
 let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
 "let g:SuperTabDefaultCompletionType = "context"
 
+" speling
+set spell spelllang=en_us
+imap <F5> <C-o>:setlocal spell!<CR>
+
 " theme
 set background=dark
 let g:solarized_termtrans=1
@@ -41,14 +45,14 @@ set guifont=Monaco:h12
 " autotab/indent stuff
 "set et
 set autoindent
-" erase previously entered chars, autoindent and newlines 
+" erase previously entered chars, autoindent and newlines
 set backspace=indent,eol,start
 "set smarttab
 "set smartindent
 "set indentexpr
 set tabstop=2
 set shiftwidth=2
-set expandtab 
+set expandtab
 " show matching brace/paren
 set showmatch
 " autoindent perl only
@@ -121,7 +125,7 @@ set hlsearch  " highlight search
 set diffopt=filler
 " ignore whitespace
 set diffopt+=iwhite
-nmap <F8> :TagbarToggle<CR> " 
+nmap <F8> :TagbarToggle<CR> "
 map <C-n> :NERDTreeToggle<CR> " ctrl-n for nerdtree
 
 " setup hilight colorscheme for whitespace
