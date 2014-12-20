@@ -69,5 +69,4 @@ export HISTCONTROL HISTSIZE HISTIGNORE EDITOR MANPAGER
 
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history
-#export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"

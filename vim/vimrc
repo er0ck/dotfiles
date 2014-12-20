@@ -21,16 +21,34 @@ map <down> <nop>
 map <left> <nop>
 map <right> <nop>
 
+" no more shift!
+nnoremap ; :
+" make Y yank to end of line!  duh
+map Y y$
+
 " setup the omnicomplete function
 set omnifunc=syntaxcomplete#Complete
-" use supertab for omnicomplete or speling based on context
-" has to be after omnicomplete configs
-let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
-"let g:SuperTabDefaultCompletionType = "context"
+set completeopt=longest,menuone
+let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 
 " speling
 set spell spelllang=en_us
+set spell!
 imap <F5> <C-o>:setlocal spell!<CR>
+
+" syntastic syntax checking
+let g:syntastic_ruby_checkers          = ['rubocop']
+"let g:syntastic_ruby_checkers          = ['rubocop', 'mri']
+"let g:syntastic_check_on_open=1
+let g:syntastic_check_on_wq = 0  " don't check on quit
+"let g:syntastic_enable_signs=1
+let g:syntastic_error_symbol = "✗"
+let g:syntastic_style_error_symbol = "s✗"
+let g:syntastic_warning_symbol = "⚠"
+let g:syntastic_style_warning_symbol = "s⚠"
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
 " theme
 set background=dark
@@ -45,15 +63,15 @@ nmap <leader>l :set list!<CR>
 "set listchars=tab:▸\ ,eol:¬"
 
 "Hide abandon buffers in order to not lose undo history.
-set hid
+"hides buffers instead of closing them
+set hidden
 " autosave buffers when switching buffers
-set autowrite
+"set autowrite
+" use w!! if you forgot to sudo before opening a file.  dangerous?
+cmap w!! w !sudo tee % >/dev/null
 set noerrorbells " No noise.
 set mousehide " hide mouse after typing
-set guifont=Monaco:h12
-" autotab/indent stuff
-"set et
-set autoindent
+set guifont=Monaco:h12  " probably only works on OSX?
 " erase previously entered chars, autoindent and newlines
 set backspace=indent,eol,start
 "set smarttab
@@ -64,6 +82,10 @@ set shiftwidth=2
 set expandtab
 " show matching brace/paren
 set showmatch
+
+" autotab/indent stuff
+"set et
+set autoindent
 " autoindent perl only
 "autocmd FileType perl set autoindent|set smartindent
 " make tab in v mode ident code
@@ -91,18 +113,6 @@ nnoremap <C-H> <C-W><C-H>
 set splitbelow
 set splitright
 
-" tagbar stuff for ruby
-let g:tagbar_type_ruby = {
-    \ 'kinds' : [
-        \ 'm:modules',
-        \ 'c:classes',
-        \ 'd:describes',
-        \ 'C:contexts',
-        \ 'f:methods',
-        \ 'F:singleton methods'
-    \ ]
-\ }
-
 set tags+=./tags,tags;
 set tags+=~/repos/er0ck/*/.git/tags
 
@@ -118,23 +128,24 @@ set pastetoggle=<F2>
 "set ruler
 " always show statusbar
 set laststatus=2
-set statusline=%<%f\ %h%m%r\ %y%=%{v:register}\ %-14.(%l,%c%V%)\ %P
+set statusline+=%<%f\ %h%m%r\ %y%=%{v:register}\ %-14.(%l,%c%V%)\ %P
 " show linenumbers on left
 set number
 " start searching before enter
 set incsearch
+set ignorecase " case insensitive search.  affects matching
 set smartcase " use case sensitive when caps used
 set hlsearch  " highlight search
+nmap <silent> ,/ :nohlsearch<CR> " clear search highlights
 " alt left and right for buffer up/dn
-:nmap <M-Left> :bprev<CR>
-:nmap <M-Right> :bnext<CR>
+:nmap <M-left> :bprev<CR>
+:nmap <M-right> :bnext<CR>
 
 " vimdiff settings
 " fill in space btwn lines to align buffers:
 set diffopt=filler
 " ignore whitespace
 set diffopt+=iwhite
-nmap <F8> :TagbarToggle<CR> "
 map <C-n> :NERDTreeToggle<CR> " ctrl-n for nerdtree
 
 " setup hilight colorscheme for whitespace
@@ -146,7 +157,7 @@ match ExtraWhitespace /\s\+\%#\@<!$/
 
 " StripTrailingWhitespaces and hotkey
 " from: Drew Neil (@nelstrom)
-nnoremap <silent> <F5> :call <SID>StripTrailingWhitespaces()<CR>
+nnoremap <silent> <F6> :call <SID>StripTrailingWhitespaces()<CR>
 function! <SID>StripTrailingWhitespaces()
   " Preparation: save last search, and cursor position.
   let _s=@/
