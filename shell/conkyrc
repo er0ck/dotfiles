@@ -1,0 +1,71 @@
+# fork to background?
+background              yes
+use_xft                 yes
+xftfont                 aqua:size=10
+#xftalpha                0.2
+double_buffer           yes
+update_interval         2
+alignment               top_left
+gap_x                   10
+gap_y                   10
+no_buffers              yes
+minimum_size            265x400
+draw_shades 		    yes
+draw_outline 		    no
+maximum_width 		    800
+pad_percents            3
+cpu_avg_samples         8
+net_avg_samples         8
+use_spacer              right
+
+TEXT
+${color #ffcb48}$nodename$color ${color #98c2c7}$sysname $kernel on $machine$color
+${color slate grey}Up:$color ${uptime_short}.  ${user_number} ${color slate grey}users logged in:$color ${user_names}
+
+#${color #98c2c7}CPU:$color $cpu% ${freq_g}GHz ${color #98c2c7}Temp:$color ${execi 8 sensors | grep -A 1 'Core 0' | cut -c15-16 | sed '/^$/d'}*C  ${color #98c2c7}M/B Temp:$color ${execi 8 sensors | grep 'M/B' | cut -c15-16 | sed '/^$/d'}*C
+${color #98c2c7}CPU:$color $cpu% ${freq_g}GHz ${color #98c2c7}Temp:$color NA*C  ${color #98c2c7}M/B Temp:$color NA*C
+${color #78af78}${cpubar 7,300}
+${color #78af78}${cpugraph cpu1 25,300 78af78 a3a3a3}
+${color #78af78}${cpugraph cpu2 25,300 78af78 a3a3a3}
+${color slate grey}Processes:$color $running_processes/$processes ${color slate grey}Load:$color $loadavg
+${color #98c2c7}NAME${goto 100}PID${goto 150}CPU%${goto 200}MEM%
+${color #e5e5e5}${top name 1}${goto 100}${top pid 1}${goto 150}${top cpu 1}${goto 200}${top mem 1}
+${color #c4c4c4}${top name 2}${goto 100}${top pid 2}${goto 150}${top cpu 2}${goto 200}${top mem 2}
+${color #a3a3a3}${top name 3}${goto 100}${top pid 3}${goto 150}${top cpu 3}${goto 200}${top mem 3}
+
+${color #98c2c7}RAM:$color $memperc% $mem/$memmax  ${color #98c2c7}Swap:$color $swapperc% $swap/$swapmax
+${color #98c2c7}NAME${goto 100}PID${goto 150}CPU%${goto 200}MEM%
+${color #e5e5e5}${top_mem name 1}${goto 100}${top_mem pid 1}${goto 150}${top_mem cpu 1}${goto 200}${top_mem mem 1}
+${color #c4c4c4}${top_mem name 2}${goto 100}${top_mem pid 2}${goto 150}${top_mem cpu 2}${goto 200}${top_mem mem 2}
+${color #a3a3a3}${top_mem name 3}${goto 100}${top_mem pid 3}${goto 150}${top_mem cpu 3}${goto 200}${top_mem mem 3}
+
+#${color #98c2c7}/dev/sda  read: ${diskio_read sda} ${goto 175}write: ${diskio_write sda} ${goto 275}Temp:$color ${hddtemp /dev/sda}*C
+${color #98c2c7}/dev/sda  read: ${diskio_read sda} ${goto 175}write: ${diskio_write sda}
+${color #78af78}${diskiograph_read sda 25,350}$color
+${color #78af78}${diskiograph_write sda 25,350}$color
+${color #98c2c7}/dev/sdb  read: ${diskio_read sdb} ${goto 175}write: ${diskio_write sdb} ${goto 275}Temp:$color ${hddtemp /dev/sdb}*C
+${color #78af78}${diskiograph_read sdb 25,350}$color
+${color #78af78}${diskiograph_write sdb 25,350}$color
+${color #98c2c7}root:${goto 50}$color ${fs_free_perc /}% ${fs_free /} ${goto 145}${color #78af78}${fs_bar 7,280 /}$color
+${color #98c2c7}home:${goto 50}$color ${fs_free_perc /home}% ${fs_free /home} ${goto 145}${color #78af78}${fs_bar 7,280 /home}$color
+${color #98c2c7}tmp:${goto 50}$color ${fs_free_perc /tmp}% ${fs_free /tmp} ${goto 145}${color #78af78}${fs_bar 7,280 /tmp}$color
+${color #98c2c7}vtmp:${goto 50}$color ${fs_free_perc /var/tmp}% ${fs_free /var/tmp} ${goto 145}${color #78af78}${fs_bar 7,280 /var/tmp}$color
+${color #98c2c7}raid:${goto 50}$color ${fs_free_perc /mnt/raid}% ${fs_free /mnt/raid} ${goto 145}${color #78af78}${fs_bar 7,280 /mnt/raid}$color
+
+${color #98c2c7}eth0: ${color #98c2c7}DOWN: ${color #ffffff}${downspeed eth0}/s ${goto 190}${color #98c2c7}UP: ${color #ffffff}${upspeed eth0}/s
+${color #98c2c7}${downspeedgraph eth0 25,150 78af78 a3a3a3} ${goto 190}${color #98c2c7}${upspeedgraph eth0 25,150 78af78 a3a3a3}
+${if_up tun0}${color #98c2c7}tun0: ${color #98c2c7}DOWN: ${color #ffffff}${downspeed tun0}/s ${goto 190}${color #98c2c7}UP: ${color #ffffff}${upspeed tun0}/s
+${color #98c2c7}${downspeedgraph tun0 25,150 78af78 a3a3a3} ${goto 190}${color #98c2c7}${upspeedgraph tun0 25,150 78af78 a3a3a3} ${endif}
+${color slate grey}Last sync:$color ${execi 180 date --date="`cat /mnt/raid/portage/metadata/timestamp.chk`" +%c}
+${execi 50 genlop -lnu | sed -e 's/.*\([><]\+\)/\1/' | tail -n 3}
+${execi 50 if pgrep sandbox > /dev/null ; then genlop -cn ; fi}
+#${color #98c2c7}localhost newmail:$color ${new_mails /home/erict/.maildir/}
+#${color #98c2c7}VNC clients:$color ${execi 2 ~/bin/x11vnc-numclients.sh}
+${color green}${tail /var/log/kernel/current 10}$color
+${color red}${tail /var/log/pwdfail/current 10}$color
+${color orange}${tail /var/log/openconnect/vpn0/openconnect.err 2}$color
+${color orange}${execi 604800 glsa-check -lq affected}$color
+${color slate grey}Portage News:$color
+${execi 604800 eselect news list | tail -n 5}
+${color orange}${hr 2}$color
+${execi 86400 fortune -as}

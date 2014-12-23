@@ -55,6 +55,7 @@ alias showvm="ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).
 alias notifybeaker='notify_done beaker'
 alias git_get_head='git rev-parse HEAD'
 alias git_get_remote_head='git ls-remote puppet HEAD'
+alias git_changed_tests_csv='git diff --name-only --relative puppet/master | grep tests/ | tr "\r\n" ","'
 
 # move file and symlink to it from og position
 function lmv(){ [ -e "$1" -a -e "$2" ] && mv "$1" "$2" && ln -s "$2/$(basename $1)" "$(dirname $1)"; }
