@@ -17,6 +17,7 @@ fi
 [[ -f /etc/profile.d/bash-completion ]] && source /etc/profile.d/bash-completion
 
 [[ -f ~/dotfiles/shell/bashrc.git-completion ]] && source ~/dotfiles/shell/bashrc.git-completion
+[[ -f ~/dotfiles/shell/beaker-completion.bash ]] && source ~/dotfiles/shell/beaker-completion.bash
 [[ -f ~/dotfiles/shell/aliases ]] && source ~/dotfiles/shell/aliases
 
 export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
