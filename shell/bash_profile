@@ -1,5 +1,7 @@
 # bash_profile
-export PATH=.bundle/bin:~/bin:/opt/local/bin:/opt/local/sbin:$PATH
+PATH=.bundle/bin:~/bin:/opt/local/bin:/opt/local/sbin:$PATH
+PATH=$PATH:/Users/erict/Library/Android/sdk/tools/
+export PATH
 export BUNDLE_PATH=.bundle/
 export BUNDLE_BIN=.bundle/bin
 export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future

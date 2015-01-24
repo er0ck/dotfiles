@@ -11,7 +11,7 @@ if [[ $- != *i* ]] ; then
 	return
 fi
 
-# osx 
+# osx
 [[ -f /opt/local/etc/profile.d/bash_completion.sh ]] && source /opt/local/etc/profile.d/bash_completion.sh
 # linux
 [[ -f /etc/profile.d/bash-completion ]] && source /etc/profile.d/bash-completion

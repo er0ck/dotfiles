@@ -30,6 +30,9 @@ map Y y$
 set omnifunc=syntaxcomplete#Complete
 set completeopt=longest,menuone
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
+autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 
 " speling
 set spelllang=en_us
@@ -70,7 +73,15 @@ set hidden
 cmap w!! w !sudo tee % >/dev/null
 set noerrorbells " No noise.
 set mousehide " hide mouse after typing
-set guifont=M:h12  " probably only works on OSX?
+if has("gui_running")
+  if has("gui_gtk2")
+    set guifont=Inconsolata\ 12
+  elseif has("gui_macvim")
+    set guifont=Menlo\ Regular:h10
+  elseif has("gui_win32")
+    set guifont=Consolas:h11:cANSI
+  endif
+endif
 " erase previously entered chars, autoindent and newlines
 set backspace=indent,eol,start
 "set smarttab
@@ -81,6 +92,8 @@ set shiftwidth=2
 set expandtab
 " show matching brace/paren
 set showmatch
+" show column 80
+set colorcolumn=80
 
 " autotab/indent stuff
 set autoindent

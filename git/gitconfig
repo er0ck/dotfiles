@@ -11,6 +11,7 @@
 [core]
 	excludesfile = ~/dotfiles/git/gitignore_global
 	whitespace = trailing-space,space-before-tab
+	autocrlf = input
 [credential]
     helper = osxkeychain
 [init]
@@ -19,6 +20,7 @@
   co = checkout
   br = branch
   lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  pu = !"git fetch origin -v; git fetch upstream -v; git merge upstream/master"
 [merge]
 	tool = gvimdiff
 [push]
