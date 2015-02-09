@@ -123,6 +123,10 @@ set tags+=~/repos/er0ck/*/.git/tags
 nnoremap <F2> :set invpaste paste?<CR>
 imap <F2> <C-O><F2>
 set pastetoggle=<F2>
+
+" ii to exit insert mode
+:imap ii <Esc>
+
 " dont use Q for Ex mode
 "map Q :q
 "map q :q

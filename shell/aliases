@@ -51,7 +51,6 @@ alias be="bundle exec"
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
 alias killvm='grep -oE "[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \(.*?\)" log/latest/*-run.log | sort | uniq | awk '\''{print $1}'\'' | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""'
-alias showvm="ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log | sort | uniq;echo''"
 alias notifybeaker='notify_done beaker'
 alias git_get_head='git rev-parse HEAD'
 alias git_get_remote_head='git ls-remote upstream HEAD'
@@ -72,8 +71,22 @@ lsvm() {
 getvm() {
   curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[0]]["hostname"]'
 }
+showvm() {
+  HOSTS_FROM_LOG=`ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log`
+  # if hosts variable is not empty/whitespace
+  if [[ ! -z "${HOSTS_FROM_LOG// /}" ]]; then
+    echo "$HOSTS_FROM_LOG" | sort | uniq
+  else
+    ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?' hosts.cfg
+  fi
+}
 sshvm() {
-  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
+  if ! host $1 > /dev/null 2>&1; then
+    HOSTNAME=`showvm | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$HOSTNAME "${@:2}"
+  else
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
+  fi
 }
 sshwinvm() {
   ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"

@@ -23,10 +23,11 @@ if [ ${#HOSTNAMES[@]} -ne ${#CONFNAMES[@]} ]; then echo "problem reading log/lat
 #echo ${ROLES[1]}
 
 [ -f ${1} ] || { echo "config file '${1}' not found"; exit 2; }
-cp ${1} hosts.cfg
+HOSTS_PRESERVED_FILE='hosts_preserved.cfg'
+cp ${1} $HOSTS_PRESERVED_FILE
 
 # TODO count confnames in file, if not all replaced, warn user
-# grep  -ce '    .{15}' hosts.cfg
+# grep  -ce '    .{15}' $HOSTS_PRESERVED_FILE
 
 # for CONFNAMES
 i=0
@@ -35,8 +36,8 @@ for THISCONF in "${CONFNAMES[@]}"; do
   TEMPCONF=($(echo ${THISCONF} | cut -d "(" -f 2))
   TEMPCONF=($(echo ${TEMPCONF} | cut -d ")" -f 1))
   #echo ${TEMPCONF}
-  # substitute CONFNAME{i} in hosts.cfg in place with HOSTNAME{i}
-  sed -i '' "s/^  ${TEMPCONF}:$/  ${HOSTNAMES[i]}:/" hosts.cfg
+  # substitute CONFNAME{i} in $HOSTS_PRESERVED_FILE in place with HOSTNAME{i}
+  sed -i '' "s/^  ${TEMPCONF}:$/  ${HOSTNAMES[i]}:/" $HOSTS_PRESERVED_FILE
   ((i = i + 1))
 done
 
