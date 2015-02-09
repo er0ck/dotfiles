@@ -64,13 +64,16 @@ mkcd () {
   mkdir -p "$*"
   cd "$*"
 }
+
 # vcloud curl command one-liners
 lsvm() {
   curl --url http://vcloud.delivery.puppetlabs.net/vm 2> /dev/null | ruby -e 'require "json"; JSON.parse(STDIN.read).each { |vm| puts vm }'
 }
+
 getvm() {
   curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[0]]["hostname"]'
 }
+
 showvm() {
   HOSTS_FROM_LOG=`ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log`
   # if hosts variable is not empty/whitespace
@@ -80,17 +83,25 @@ showvm() {
     ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?' hosts.cfg
   fi
 }
+
 sshvm() {
   if ! host $1 > /dev/null 2>&1; then
-    HOSTNAME=`showvm | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    HOSTNAME=`showvm | head -1 | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$HOSTNAME "${@:2}"
   else
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
   fi
 }
+
 sshwinvm() {
-  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"
+  if ! host $1 > /dev/null 2>&1; then
+    HOSTNAME=`showvm | head -1 | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$HOSTNAME "${@:2}"
+  else
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"
+  fi
 }
+
 rmvm() {
   curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 ; echo""
 }
