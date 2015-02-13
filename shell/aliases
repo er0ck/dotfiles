@@ -86,7 +86,8 @@ showvm() {
 
 sshvm() {
   if ! host $1 > /dev/null 2>&1; then
-    HOSTNAME=`showvm | head -1 | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    echo "logging us into: $HOSTNAME"
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$HOSTNAME "${@:2}"
   else
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
@@ -95,7 +96,8 @@ sshvm() {
 
 sshwinvm() {
   if ! host $1 > /dev/null 2>&1; then
-    HOSTNAME=`showvm | head -1 | grep $1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
+    echo "logging us into: $HOSTNAME"
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$HOSTNAME "${@:2}"
   else
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"
