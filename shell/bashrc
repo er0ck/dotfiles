@@ -65,8 +65,9 @@ HISTCONTROL=erasedups
 HISTSIZE=10000
 HISTIGNORE="&:ls:[bf]g:exit:cd:cd -:pwd:cd ..:..:...:ll:la"
 EDITOR=vim
+VIEWER=$EDITOR
 MANPAGER="less -X"
-export HISTCONTROL HISTSIZE HISTIGNORE EDITOR MANPAGER
+export HISTCONTROL HISTSIZE HISTIGNORE EDITOR VIEWER MANPAGER
 
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history

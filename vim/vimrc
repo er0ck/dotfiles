@@ -9,11 +9,13 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins"
 
-set noautochdir " force macvim to not set working dir to current file
 " don't care about modula2; set all *.md as markdown
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+autocmd BufRead,BufNewFile *.md setlocal spell
 " Set up puppet manifest and spec options
 autocmd BufNewFile,BufReadPost *.pp set filetype=puppet
+" turn on spelling for git commit messages
+autocmd FileType gitcommit setlocal spell
 
 " disable arrow keys in escape mode
 map <up> <nop>
@@ -77,6 +79,7 @@ if has("gui_running")
   if has("gui_gtk2")
     set guifont=Inconsolata\ 12
   elseif has("gui_macvim")
+    set transparency=15
     set guifont=Menlo\ Regular:h10
   elseif has("gui_win32")
     set guifont=Consolas:h11:cANSI
@@ -176,3 +179,7 @@ function! <SID>StripTrailingWhitespaces()
   let @/=_s
   call cursor(l, c)
 endfunction
+
+set noautochdir " force macvim to not set working dir to current file
+" ,cd to chdir to the path of the current file, then pwd
+nnoremap ,cd :cd %:p:h<CR>:pwd<CR>

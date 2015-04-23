@@ -71,7 +71,7 @@ lsvm() {
 }
 
 getvm() {
-  curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[0]]["hostname"]'
+  curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[1]]["hostname"] + "." + resp["domain"]'
 }
 
 showvm() {
@@ -80,7 +80,9 @@ showvm() {
   if [[ ! -z "${HOSTS_FROM_LOG// /}" ]]; then
     echo "$HOSTS_FROM_LOG" | sort | uniq
   else
-    ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?' hosts.cfg
+    if [[ -f hosts_preserved.cfg ]]; then
+      ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?' hosts_preserved.cfg
+    fi
   fi
 }
 

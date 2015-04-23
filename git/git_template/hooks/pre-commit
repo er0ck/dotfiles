@@ -6,7 +6,8 @@
 #
 
 # ensure this isn't run against non-staged files
-git stash --quiet --keep-index --include-untracked
+# this is VERY annoying.  we should find a better way to do this
+#git stash --quiet --keep-index --include-untracked
 
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
@@ -40,7 +41,7 @@ To be portable it is advisable to rename the file.
 If you know what you are doing you can disable this check using:
   git config hooks.allownonascii true
 EOF
-  git stash pop -q
+  #git stash pop -q
 	exit 1
 fi
 
@@ -49,11 +50,11 @@ fi
 git diff-index --check --cached $against --
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-  git stash pop -q
+  #git stash pop -q
   exit 1
 fi
 
 .git/hooks/pre-commit-pry
-git stash pop -q
+#git stash pop -q
 
 exit 0
