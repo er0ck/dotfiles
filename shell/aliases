@@ -1,4 +1,4 @@
-# erict@erict.net .alias file
+# erict@urict.net .alias file
 #   should work in osx and linux
 #   aliases at the top, functions at bottom
 
@@ -50,7 +50,6 @@ alias bi="bundle install"
 alias be="bundle exec"
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
-alias killvm='grep -oE "[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \(.*?\)" log/latest/*-run.log | sort | uniq | awk '\''{print $1}'\'' | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""'
 alias notifybeaker='notify_done beaker'
 alias git_get_head='git rev-parse HEAD'
 alias git_get_remote_head='git ls-remote upstream HEAD'
@@ -74,40 +73,49 @@ getvm() {
   curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[1]]["hostname"] + "." + resp["domain"]'
 }
 
+HOST_PATTERN='[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'
+ROLE_PATTERN='\((?!speed,).*?\)'
 showvm() {
-  HOSTS_FROM_LOG=`ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)? \((?!speed,).*?\)' log/latest/*-run.log`
+  HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/latest/sut.log`
   # if hosts variable is not empty/whitespace
   if [[ ! -z "${HOSTS_FROM_LOG// /}" ]]; then
-    echo "$HOSTS_FROM_LOG" | sort | uniq
-  else
-    if [[ -f hosts_preserved.cfg ]]; then
-      ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?' hosts_preserved.cfg
+    echo "$HOSTS_FROM_LOG"
+  else # fallback if no roles in sut file
+    HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN" log/latest/sut.log`
+    # if hosts variable is not empty/whitespace
+    if [[ ! -z "${HOSTS_FROM_LOG// /}" ]]; then
+      echo "$HOSTS_FROM_LOG"
+    else
+      if [[ -f log/latest/*.yaml ]]; then
+        ack -oh  "$HOST_PATTERN" *.yaml
+      fi
     fi
   fi
 }
 
+WIN_PATTERN=' win\d\d\d\d'
 sshvm() {
+  HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  "$HOST_PATTERN"`
+  # find out if we're asking to login to a windows host
+  USERNAME='root'
+  $(ack -oh "$WIN_PATTERN" log/latest/sut.log) && USERNAME='Administrator'
+  echo "logging us into: $HOSTNAME as $USERNAME"
+  # if the host resolves, log us in, otherwise we're asking for a role
+  #   the role resolved to a hostname in HOSTNAME var above
   if ! host $1 > /dev/null 2>&1; then
-    HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
-    echo "logging us into: $HOSTNAME"
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$HOSTNAME "${@:2}"
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$HOSTNAME "${@:2}"
   else
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance root@$1 "${@:2}"
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$1 "${@:2}"
   fi
 }
 
-sshwinvm() {
-  if ! host $1 > /dev/null 2>&1; then
-    HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  '[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'`
-    echo "logging us into: $HOSTNAME"
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$HOSTNAME "${@:2}"
-  else
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance Administrator@$1 "${@:2}"
-  fi
-}
-
+# TODO: allow roles to be passed to this function like sshvm
 rmvm() {
   curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 ; echo""
+}
+
+killvm() {
+  showvm | ack -oh  "$HOST_PATTERN" | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""
 }
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
