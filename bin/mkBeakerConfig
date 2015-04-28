@@ -40,4 +40,3 @@ for THISCONF in "${CONFNAMES[@]}"; do
   sed -i '' "s/^  ${TEMPCONF}:$/  ${HOSTNAMES[i]}:/" $HOSTS_PRESERVED_FILE
   ((i = i + 1))
 done
-
