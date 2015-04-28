@@ -1,5 +1,5 @@
 # bash_profile
-PATH=.bundle/bin:~/bin:/opt/local/bin:/opt/local/sbin:$PATH
+PATH=~/bin:/opt/local/bin:/opt/local/sbin:$PATH
 PATH=$PATH:/Users/erict/Library/Android/sdk/tools/
 export PATH
 export BUNDLE_PATH=.bundle/

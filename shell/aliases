@@ -93,12 +93,14 @@ showvm() {
   fi
 }
 
-WIN_PATTERN=' win\d\d\d\d'
+WIN_PATTERN='\swindows-\d\d\d\d'
+# TODO: if no roles set in sut.log but only one hosts, just use that one...
+#    if asking for master or database log us into the first one
 sshvm() {
   HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  "$HOST_PATTERN"`
   # find out if we're asking to login to a windows host
   USERNAME='root'
-  $(ack -oh "$WIN_PATTERN" log/latest/sut.log) && USERNAME='Administrator'
+  ack -oh "$WIN_PATTERN" log/latest/sut.log &>/dev/null && USERNAME='Administrator'
   echo "logging us into: $HOSTNAME as $USERNAME"
   # if the host resolves, log us in, otherwise we're asking for a role
   #   the role resolved to a hostname in HOSTNAME var above
@@ -114,6 +116,7 @@ rmvm() {
   curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 ; echo""
 }
 
+# TODO: make some pretty/informative output
 killvm() {
   showvm | ack -oh  "$HOST_PATTERN" | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""
 }
