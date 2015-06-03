@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 # rename list of files using pattern
+# eg: rename_files 's/(\w)\.sh/\1/' *.sh
 #
 
 ($regexp = shift @ARGV) || die "Usage: $0 perlexpr [filenames]\n";

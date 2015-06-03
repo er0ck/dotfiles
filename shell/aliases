@@ -76,7 +76,13 @@ getvm() {
 HOST_PATTERN='[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'
 ROLE_PATTERN='\((?!speed,).*?\)'
 showvm() {
-  HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/latest/sut.log`
+  if [[ -f log/latest ]]; then
+    HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/latest/sut.log`
+  else # beaker-rspec doesn't provide a latest link:
+    LATEST_CONFIG=`ls -t log/ | head -1`
+    LATEST=$(ls -t log/$LATEST_CONFIG/ | head -1)
+    HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/$LATEST_CONFIG/$LATEST/sut.log`
+  fi
   # if hosts variable is not empty/whitespace
   if [[ ! -z "${HOSTS_FROM_LOG// /}" ]]; then
     echo "$HOSTS_FROM_LOG"
@@ -100,7 +106,7 @@ sshvm() {
   HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  "$HOST_PATTERN"`
   # find out if we're asking to login to a windows host
   USERNAME='root'
-  ack -oh "$WIN_PATTERN" log/latest/sut.log &>/dev/null && USERNAME='Administrator'
+  ack -oh "$WIN_PATTERN[^\r\n]*$HOSTNAME" log/latest/sut.log &>/dev/null && USERNAME='Administrator'
   echo "logging us into: $HOSTNAME as $USERNAME"
   # if the host resolves, log us in, otherwise we're asking for a role
   #   the role resolved to a hostname in HOSTNAME var above

@@ -6,7 +6,7 @@ TICKET=`echo ${1} | tr '[:lower:]' '[:upper:]'`
 
 # force to check-ref-format standards, then check it
 # https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html
-BRANCH=`echo "${TICKET}-\`jira_get_issue_summary.sh ${1}\`" | sed -e 's/[ ~^:?*\[\\.]/_/g'`
+BRANCH=`echo "${TICKET}-\`jira_get_issue_summary ${1}\`" | sed -e 's/[ ~^:?*\[\\.]/_/g'`
 echo $BRANCH
 
 # get parent branch name (current branch)
