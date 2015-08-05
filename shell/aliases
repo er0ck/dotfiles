@@ -10,7 +10,6 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ~="cd ~"
-alias -- -="cd -"
 
 case $_myos in
    Linux)
@@ -64,6 +63,15 @@ mkcd () {
   cd "$*"
 }
 
+# force mvim to create/open empty files
+mvim () {
+  local f
+  for f; do
+    test -e "$f" || touch "$f"
+  done
+  open -a macvim "$@"
+}
+
 # vcloud curl command one-liners
 lsvm() {
   curl --url http://vcloud.delivery.puppetlabs.net/vm 2> /dev/null | ruby -e 'require "json"; JSON.parse(STDIN.read).each { |vm| puts vm }'
@@ -73,14 +81,22 @@ getvm() {
   curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[1]]["hostname"] + "." + resp["domain"]'
 }
 
+# get beaker log this many backwards from latest
+beaker_log_dir() {
+  LINE_NUM=$1
+  LATEST_CONFIG=$(/bin/ls -t log/ | sed -n "${LINE_NUM}{p;q;}")
+  LATEST=$(/bin/ls -t log/$LATEST_CONFIG/ | sed -n "${LINE_NUM}{p;q;}")
+  echo "log/$LATEST_CONFIG/$LATEST/"
+}
+
 HOST_PATTERN='[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'
 ROLE_PATTERN='\((?!speed,).*?\)'
 showvm() {
-  if [[ -f log/latest ]]; then
+  if [[ -d log/latest ]]; then
     HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/latest/sut.log`
   else # beaker-rspec doesn't provide a latest link:
-    LATEST_CONFIG=`ls -t log/ | head -1`
-    LATEST=$(ls -t log/$LATEST_CONFIG/ | head -1)
+    LATEST_CONFIG=$(/bin/ls -t log/ | sed -n "1{p;q;}")
+    LATEST=$(/bin/ls -t log/$LATEST_CONFIG/ | sed -n "1{p;q;}")
     HOSTS_FROM_LOG=`ack -oh  "$HOST_PATTERN $ROLE_PATTERN" log/$LATEST_CONFIG/$LATEST/sut.log`
   fi
   # if hosts variable is not empty/whitespace
@@ -129,11 +145,18 @@ killvm() {
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
 
-# force mvim to create/open empty files
-mvim () {
-  local f
-  for f; do
-    test -e "$f" || touch "$f"
-  done
-  open -a macvim "$@"
+# ${var^} doesn't work in bash < 4, default in osx :-(
+first_char_toupper() {
+first=`echo $1 | cut -c1 | tr [a-z] [A-Z]`
+second=`echo $1 | cut -c2-`
+echo $first$second
+}
+
+# get latest agent sha given component branch name
+get_latest_sha() {
+  JENKINS_URL='jenkins.puppetlabs.com/view/All%20in%20One%20Agent/view/'
+  branch_name=$1
+  BRANCH_NAME=`first_char_toupper $branch_name`
+  SHORT_SHA=`curl --silent --url curl https://${JENKINS_URL}/${BRANCH_NAME}/view/Puppet/job/platform_aio-puppet_pkg-promote_${branch_name}/lastSuccessfulBuild/ | grep --extended --only-matching 'Build\/\">#\d+\s+\w+' | awk -F ' ' '{print $2}'`
+  curl --silent --url 'http://builds.puppetlabs.lan/puppet-agent/?C=M;O=D' | grep --extended --only-matching "$SHORT_SHA\w+" | head -n 1
 }

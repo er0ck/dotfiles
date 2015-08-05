@@ -61,7 +61,7 @@ shopt -s histappend
 #"\e[A": history-search-backward
 bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
-HISTCONTROL=erasedups
+HISTCONTROL=ignoreboth
 HISTSIZE=10000
 HISTIGNORE="&:ls:[bf]g:exit:cd:cd -:pwd:cd ..:..:...:ll:la"
 EDITOR=vim
