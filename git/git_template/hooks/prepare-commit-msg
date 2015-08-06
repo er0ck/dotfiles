@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# place branchname as title.
+
+COMMIT_EDITMSG=$1
+
+get_ticket_from_branchname() {
+  NAME=$1
+  TICKET_PATTERN='\(?\w+-\d+\)?'
+  MAINT_PATTERN='\<maint\>'
+
+  TICKET=`echo $NAME | grep --extended --only-matching "$TICKET_PATTERN"`
+  # if no ticket
+  if [[ -z "$TICKET" ]]; then
+    # search for maint at word boundaries
+    # caution: wont find maint with '_' before or after it
+    TICKET=`echo $NAME | grep --extended --only-matching "$MAINT_PATTERN"`
+  fi
+  echo $TICKET
+}
+
+create_title_from_branchname() {
+  NAME=$1
+  TICKET_PATTERN='[a-zA-Z0-9]+-[0-9]+'
+  MAINT_PATTERN='(\/?)maint(\/?)'
+
+  # remove maint
+  TITLE=`echo $NAME  | sed -E "s/$MAINT_PATTERN/\1\2/"`
+  # remove ticket, put in later
+  TITLE=`echo $TITLE | sed -E "s/$TICKET_PATTERN//"`
+  # use portion after last /
+  TITLE=`echo $TITLE | sed -E "s/.*\///"`
+  # remove underscores
+  TITLE=`echo $TITLE | sed -E "s/_/ /g"`
+
+  TICKET=`get_ticket_from_branchname $NAME`
+  echo "($TICKET) $TITLE"
+}
+
+# we're pre-pending to the top of the "file" so do these in reverse order
+NAME=$(git branch | grep '^\*' | cut -b3-)
+
+# if acceptance in branchname, add '[skip ci]' in body
+if echo "$NAME" | grep --quiet --ignore-case "acceptance"; then
+  echo "\n[skip ci]$(cat $COMMIT_EDITMSG)" > $COMMIT_EDITMSG
+fi
+
+DESCRIPTION=$(git config branch."$NAME".description)
+echo "`create_title_from_branchname $NAME`\n$(cat $COMMIT_EDITMSG)" > $COMMIT_EDITMSG
+#if [ -n "$DESCRIPTION" ]; then
+#echo "$DESCRIPTION" >> $COMMIT_EDITMSG
+#fi
