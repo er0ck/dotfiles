@@ -77,8 +77,12 @@ lsvm() {
   curl --url http://vcloud.delivery.puppetlabs.net/vm 2> /dev/null | ruby -e 'require "json"; JSON.parse(STDIN.read).each { |vm| puts vm }'
 }
 
+my_vmpooler_token() {
+  grep --extended --only-matching 'vmpooler_token: .*' ${HOME}/.fog | awk -F ' ' '{print $2}'
+}
+
 getvm() {
-  curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[1]]["hostname"] + "." + resp["domain"]'
+  curl -d --url http://vcloud.delivery.puppetlabs.net/vm/$1 -H X-AUTH-TOKEN:$(my_vmpooler_token) 2> /dev/null | ruby -e 'require "json"; resp = JSON.parse(STDIN.read); puts resp[resp.keys[1]]["hostname"] + "." + resp["domain"]'
 }
 
 # get beaker log this many backwards from latest
@@ -135,12 +139,12 @@ sshvm() {
 
 # TODO: allow roles to be passed to this function like sshvm
 rmvm() {
-  curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 ; echo""
+  curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$1 -H X-AUTH-TOKEN:$(my_vmpooler_token); echo""
 }
 
 # TODO: make some pretty/informative output
 killvm() {
-  showvm | ack -oh  "$HOST_PATTERN" | { while read i ; do curl -X DELETE --url vcloud/vm/$i ; done };echo""
+  showvm | ack -oh  "$HOST_PATTERN" | { while read i ; do curl -X DELETE --url http://vcloud.delivery.puppetlabs.net/vm/$i -H X-AUTH-TOKEN:$(my_vmpooler_token); done };echo""
 }
 # Release all hosts from today.
 #alias release-hosts="grep -oE \"[0-9a-z]{15} \(\" $PATH_TO_BEAKER/log/`date "+%Y-%m-%d*"`/pre_suite-run.log | grep -oE \"[0-9a-z]{15}\" | sort | uniq | xargs -L 1 -I some_vm curl -v -X DELETE --url vcloud/vm/some_vm"
