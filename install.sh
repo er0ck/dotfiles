@@ -15,7 +15,7 @@ create_symlink() {
   ln -s $ABSOLUTE_PATH/$1 $HOME/.$BASENAME
 }
 
-FILES=(shell/bash_profile shell/bashrc git/gitconfig shell/inputrc vim bin)
+FILES=(shell/bash_profile shell/bashrc git/gitconfig shell/inputrc vim vim/vimrc bin)
 
 for i in ${FILES[@]}; do
   backup_file ${i}
