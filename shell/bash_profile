@@ -9,6 +9,16 @@ export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
 #This file is sourced by bash when you log in interactively.
 [ -f ~/dotfiles/shell/bashrc ] && source ~/dotfiles/shell/bashrc
 
+case $_myos in
+  Linux)
+    # allow $USER to use keys. Only enter once and it will remain enabled till
+    # you delete it or reboot the server
+		/usr/bin/keychain $HOME/.ssh/github_rsa
+	  source $HOME/.keychain/$HOSTNAME-sh
+    ;;
+  *) ;;
+esac
+
 # set 256 color profile where possible
 if [[ $COLORTERM == gnome-* && $TERM == xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
   export TERM=gnome-256color
