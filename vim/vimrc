@@ -1,6 +1,12 @@
 call pathogen#infect()
 call pathogen#helptags()
 
+" map wq to w because i fat finger it ALL. THE. TIME.
+" use the slightly slower :w :q
+cnoreabbr <expr> wq
+      \ ((getcmdtype() == ':' && getcmdpos() <= 3)?
+      \ 'w' : 'wq')
+
 let mapleader=","  " change <leader> to , from \
 " turn off old bugs/limits
 set nocompatible      " We're running Vim, not Vi!
@@ -29,12 +35,26 @@ nnoremap ; :
 map Y y$
 
 " setup the omnicomplete function, using supertab and tab key
-set omnifunc=syntaxcomplete#Complete
+" complete lists generated from buffers, and tags
+set complete=.,b,u,]
 set completeopt=longest,menuone
-let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
-autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+"let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+"autocmd FileType ruby let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+autocmd FileType ruby let g:SuperTabDefaultCompletionType = "context"
+"autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
 autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+autocmd Filetype ruby setlocal omnifunc=rubycomplete#Complete
+" Move up and down in autocomplete with <c-j> and <c-k>
+inoremap <expr> <c-j> ("\<C-n>")
+inoremap <expr> <c-k> ("\<C-p>")
+
+"if has("autocmd") && exists("+omnifunc")
+  "autocmd Filetype *
+        "\ if &omnifunc == "" |
+        "\   setlocal omnifunc=syntaxcomplete#Complete |
+        "\ endif
+"endif
 
 let @p = "0Orequire 'pry'; binding.pry="
 
@@ -113,10 +133,11 @@ highlight Folded guibg=grey guifg=blue
 nnoremap <Space> za
 
 "navigation between splits; ctrl-j, k, l, h (just like home row navigation keys)
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+" this is being done in tmux with vim-tmux-navigator
+"nnoremap <C-J> <C-W><C-J>
+"nnoremap <C-K> <C-W><C-K>
+"nnoremap <C-L> <C-W><C-L>
+"nnoremap <C-H> <C-W><C-H>
 " open split to right and bottom
 set splitbelow
 set splitright
@@ -185,3 +206,18 @@ endfunction
 set noautochdir " force macvim to not set working dir to current file
 " ,cd to chdir to the path of the current file, then pwd
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
+
+" The Silver Searcher
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+endif
+
+" bind K to grep word under cursor
+nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
