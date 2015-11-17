@@ -31,9 +31,11 @@
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --numstat
   pu = !"git fetch origin -v; git fetch upstream -v; git merge upstream/master"
-  # TODO: add confirmation to the two below
+  # TODO: add preview/confirmation to the three below
+  cleanbranches = !git branch --merged | grep  '.\\{15,\\}' | xargs -n 1 git branch -d
   resetstable = !git fetch upstream && git reset --hard upstream/stable && git clean -f -d
   resetmaster = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
+	pick = add --patch
 [merge]
 	tool = gvimdiff
 [push]
