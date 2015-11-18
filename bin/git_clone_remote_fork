@@ -1,6 +1,6 @@
 #!/bin/sh
 # eg: $1 == cfacter
-git clone https://github.com/er0ck/${1}.git ${2}
+git clone git@github.com:er0ck/${1}.git ${2}
 if [[ $? != 0 ]]; then
   echo "Couldn't find repo for ${1}. Did you fork it?"
   exit $?
