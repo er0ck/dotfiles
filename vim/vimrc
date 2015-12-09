@@ -36,7 +36,7 @@ map Y y$
 
 " setup the omnicomplete function, using supertab and tab key
 " complete lists generated from buffers, and tags
-set complete=.,b,u,]
+set complete=".,b,u,]"
 set completeopt=longest,menuone
 "let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 "autocmd FileType ruby let g:SuperTabDefaultCompletionType = "<c-x><c-o>"

@@ -12,8 +12,6 @@
 	excludesfile = ~/dotfiles/git/gitignore_global
 	whitespace = trailing-space,space-before-tab
 	autocrlf = input
-[credential]
-    helper = osxkeychain
 [init]
 	templatedir = ~/dotfiles/git/git_template
 [alias]
@@ -36,7 +34,8 @@
   resetstable = !git fetch upstream && git reset --hard upstream/stable && git clean -f -d
   resetmaster = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
 	pick = add --patch
+	ctags = !.git/hooks/ctags
 [merge]
 	tool = gvimdiff
 [push]
-	default = simple
+	default = current

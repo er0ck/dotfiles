@@ -7,7 +7,7 @@ if [[ $? != 0 ]]; then
 fi
 
 cd ${1}
-git remote add upstream https://github.com/puppetlabs/${1}.git
+git remote add upstream git@github.com:puppetlabs/${1}.git
 git remote set-url --push upstream no-push
 git pu
 git co --track upstream/stable

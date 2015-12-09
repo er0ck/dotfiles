@@ -40,7 +40,7 @@ alias rmo="rm -i *~"
 alias bc="bc -l"
 alias grep='grep --colour=auto'
 alias ssh="ssh -XYC"
-alias tmux="tmux -f ~/dotfiles/tmux.conf"
+alias tmux="tmux -f ~/dotfiles/tmux/tmux.conf"
 alias bi="bundle install"
 alias be="bundle exec"
 alias git_get_head='git rev-parse HEAD'
@@ -161,7 +161,7 @@ get_latest_sha() {
     branch_name=$1
   fi
   BRANCH_NAME=`first_char_toupper $branch_name`
-  PROJECT_NAME=`first_char_toupper $project_name | urlencode`
+  PROJECT_NAME=`first_char_toupper $project_name`
   JENKINS_URL='jenkins.puppetlabs.com/view/All%20in%20One%20Agent/view/'
   SHORT_SHA=`shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_aio-puppet_pkg-promote_${branch_name}/lastSuccessfulBuild/ | grep --extended --only-matching 'Build\/\">#\d+\s+\w+' | awk -F ' ' '{print $2}'`
   shhcurl --url 'http://builds.puppetlabs.lan/puppet-agent/?C=M;O=D' | grep --extended --only-matching "$SHORT_SHA\w+" | head -n 1
