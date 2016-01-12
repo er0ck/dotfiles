@@ -46,6 +46,7 @@ alias be="bundle exec"
 alias git_get_head='git rev-parse HEAD'
 alias git_get_remote_head='git ls-remote upstream HEAD'
 alias git_changed_tests_csv='git diff --name-only --relative upstream/master | grep tests/ | tr "\r\n" ","'
+alias git=hub
 
 alias shhcurl="curl --silent --show-error"
 
