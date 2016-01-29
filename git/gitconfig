@@ -29,10 +29,12 @@
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --numstat
   pu = !"git fetch origin -v; git fetch upstream -v; git merge upstream/master"
-  # TODO: add preview/confirmation to the three below
+  # TODO: add preview/confirmation to the four below
+  # FYI: to test these standalone, remove one of the escapes before { and } and \
   cleanbranches = !git branch --merged | grep  '.\\{15,\\}' | xargs -n 1 git branch -d
-  resetstable = !git fetch upstream && git reset --hard upstream/stable && git clean -f -d
-  resetmaster = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
+  cleanremote   = !git branch -r --merged | grep '^  origin.\\{35,\\}' | sed 's/^  origin\\///' | xargs -n 1 git push origin --delete
+  resetstable   = !git fetch upstream && git reset --hard upstream/stable && git clean -f -d
+  resetmaster   = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
 	pick = add --patch
 	ctags = !.git/hooks/ctags
 [merge]
