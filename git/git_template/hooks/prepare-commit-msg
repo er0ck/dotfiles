@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#only do the message wrangling in interactive mode
+case "$2" in
+  commit) exit ;;
+  message) exit ;;
+  template) exit ;;
+  squash) exit ;;
+esac
+
 # place branchname as title.
 
 COMMIT_EDITMSG=$1

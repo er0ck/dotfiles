@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Git pre-commit hook to check Ruby (*.rb) files for Pry binding references
 # based upon https://gist.github.com/alexbevi/3436040
 FILES_PATTERN='\.rb$'
