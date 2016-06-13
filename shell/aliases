@@ -121,9 +121,9 @@ sshvm() {
   # if the host resolves, log us in, otherwise we're asking for a role
   #   the role resolved to a hostname in HOSTNAME var above
   if ! host $1 > /dev/null 2>&1; then
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$HOSTNAME "${@:2}"
+    ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$HOSTNAME "${@:2}"
   else
-    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$1 "${@:2}"
+    ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$1 "${@:2}"
   fi
 }
 
@@ -163,5 +163,24 @@ get_latest_sha() {
   fi
   #https://jenkins.puppetlabs.com/view/puppet-agent/view/stable/view/puppet/job/platform_puppet_pkg-van-promote_stable/lastSuccessfulBuild/
   JENKINS_URL='jenkins.puppetlabs.com/view/puppet-agent/view'
-  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "COMPONENT_COMMIT"}["value"]'
+  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_COMMIT"}["value"]'
+}
+
+get_latest_version() {
+  if [ $# -lt 1 ]; then
+    echo "get_latest_version <project> branch"
+    echo "where branch is one of manual, master, stable, or aardwolf"
+    echo "where project is optional and is one of puppet, hiera, facter, puppet_agent_daily, or mco"
+    return 1
+  fi
+  if [ $# -gt 1 ]; then
+    BRANCH_NAME=$2
+    PROJECT_NAME=$1
+  else
+    PROJECT_NAME='puppet'
+    BRANCH_NAME=$1
+  fi
+  #https://jenkins.puppetlabs.com/view/puppet-agent/view/stable/view/puppet/job/platform_puppet_pkg-van-promote_stable/lastSuccessfulBuild/
+  JENKINS_URL='jenkins.puppetlabs.com/view/puppet-agent/view'
+  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_VERSION"}["value"]'
 }
