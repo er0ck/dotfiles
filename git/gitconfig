@@ -31,11 +31,13 @@
   # TODO: add preview/confirmation to the four below
   # FYI: to test these standalone, remove one of the escapes before { and } and \
   cleanbranches = !git branch --merged | grep  '.\\{15,\\}' | xargs -n 1 git branch -d
-  cleanremote   = !git branch -r --merged | grep '^  origin.\\{35,\\}' | sed 's/^  origin\\///' | xargs --max-args=1 --interactive git push origin --delete
+  cleanremote   = !git branch --remotes --merged | grep '^  origin.\\{35,\\}' | sed 's/^  origin\\///' | xargs --max-args=1 --interactive git push origin --delete
   resetstable   = !git fetch upstream && git reset --hard upstream/stable && git clean -f -d
   resetmaster   = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
 	pick = add --patch
 	ctags = !.git/hooks/ctags
+  fixup = commit -a --amend --no-edit
+  whathaveidone = diff HEAD@{1}..HEAD
 [merge]
 	tool = gvimdiff
 [push]
