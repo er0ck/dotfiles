@@ -8,6 +8,8 @@ export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
 
 #This file is sourced by bash when you log in interactively.
 [ -f ~/dotfiles/shell/bashrc ] && source ~/dotfiles/shell/bashrc
+# rvm stuff
+[ -f ~/.profile ]              && source ~/.profile
 
 case $_myos in
   Linux)
@@ -137,3 +139,5 @@ set_prompt () {
   fi
 }
 PROMPT_COMMAND='set_prompt'
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

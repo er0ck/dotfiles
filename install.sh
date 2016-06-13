@@ -15,7 +15,7 @@ create_symlink() {
   ln -s $ABSOLUTE_PATH/$1 $HOME/.$BASENAME
 }
 
-FILES=(shell/bash_profile shell/bashrc git/gitconfig shell/inputrc vim vim/vimrc bin rubocop.yml)
+FILES=(bin git/gitconfig rubocop.yml shell/bash_profile shell/bashrc shell/inputrc shell/rvm_profile vim vim/vimrc)
 
 for i in ${FILES[@]}; do
   backup_file ${i}
