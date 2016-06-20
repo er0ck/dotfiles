@@ -184,3 +184,17 @@ get_latest_version() {
   JENKINS_URL='jenkins.puppetlabs.com/view/puppet-agent/view'
   shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_VERSION"}["value"]'
 }
+
+get_latest_shas() {
+  if [ $# -gt 1 ]; then
+    BRANCH_NAME=$2
+    PROJECT_NAME=$1
+  elif [ $# -gt 0 ] && [ $# -lt 2 ]; then
+    PROJECT_NAME='puppet-agent'
+    BRANCH_NAME=$1
+  else
+    PROJECT_NAME='puppet-agent'
+    BRANCH_NAME='master'
+  fi
+  shhcurl --url https://github.com/puppetlabs/${PROJECT_NAME}/commits/${BRANCH_NAME} | grep sha | grep -oE '[0-9a-z]{40}'
+}
