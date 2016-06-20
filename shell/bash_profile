@@ -1,7 +1,6 @@
 # bash_profile
-PATH=~/bin:/opt/local/bin:/opt/local/sbin:$PATH
+PATH=~/bin:~/bin/local:$PATH #exported at bottom in mac-ports added blurb
 PATH=$PATH:/Users/erict/Library/Android/sdk/tools/
-export PATH
 export BUNDLE_PATH=.bundle/
 export BUNDLE_BIN=.bundle/bin
 export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
@@ -141,3 +140,11 @@ set_prompt () {
 PROMPT_COMMAND='set_prompt'
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+##
+# Your previous /Users/erict/.bash_profile file was backed up as /Users/erict/.bash_profile.macports-saved_2016-05-19_at_14:55:35
+##
+
+# MacPorts Installer addition on 2016-05-19_at_14:55:35: adding an appropriate PATH variable for use with MacPorts.
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+# Finished adapting your PATH environment variable for use with MacPorts.
