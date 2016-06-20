@@ -1,6 +1,35 @@
+rename-window puppet
 selectp -t 0      # Select pane 0
 splitw -h -p 50   # Split pane 0 vertically by 50%
 selectp -t 1      # Select pane 1
 splitw -v -p 50   # Split pane 1 horizontally by 25%
-send-keys -t 1 'beaker --help' Enter
-send-keys -t 0 C-z 'vim' Enter
+send-keys -t 0 'cd ~/projects/puppet' Enter
+send-keys -t 1 'cd ~/projects/puppet' Enter
+send-keys -t 2 'cd ~/projects/puppet' Enter
+
+new-window -n pxp
+selectp -t 0      # Select pane 0
+splitw -h -p 50   # Split pane 0 vertically by 50%
+selectp -t 1      # Select pane 1
+splitw -v -p 50   # Split pane 1 horizontally by 25%
+send-keys -t 0 'cd ~/projects/pxp-agent' Enter
+send-keys -t 1 'cd ~/projects/pxp-agent' Enter
+send-keys -t 2 'cd ~/projects/pxp-agent' Enter
+
+new-window -n beaker
+selectp -t 0      # Select pane 0
+splitw -h -p 50   # Split pane 0 vertically by 50%
+selectp -t 1      # Select pane 1
+splitw -v -p 50   # Split pane 1 horizontally by 25%
+send-keys -t 0 'cd ~/projects/beaker' Enter
+send-keys -t 1 'cd ~/projects/beaker' Enter
+send-keys -t 2 'cd ~/projects/beaker' Enter
+
+new-window -n rototiller
+selectp -t 0      # Select pane 0
+splitw -h -p 50   # Split pane 0 vertically by 50%
+selectp -t 1      # Select pane 1
+splitw -v -p 50   # Split pane 1 horizontally by 25%
+send-keys -t 0 'cd ~/projects/rototiller' Enter
+send-keys -t 1 'cd ~/projects/rototiller' Enter
+send-keys -t 2 'cd ~/projects/rototiller' Enter
