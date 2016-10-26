@@ -39,7 +39,7 @@ alias mroe="more"
 alias rmo="rm -i *~"
 alias bc="bc -l"
 alias grep='grep --colour=auto'
-alias ssh="ssh -XYC"
+alias ssh="ssh -A"
 alias tmux="tmux -f ~/dotfiles/tmux/tmux.conf"
 alias bi="bundle install"
 alias be="bundle exec"
