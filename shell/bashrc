@@ -11,14 +11,19 @@ if [[ $- != *i* ]] ; then
 	return
 fi
 
+COMPLETION_HELPERS=~/dotfiles/shell/bash_completion_helpers
+[[ -f $COMPLETION_HELPERS ]] && source $COMPLETION_HELPERS
 # osx
 [[ -f /opt/local/etc/profile.d/bash_completion.sh ]] && source /opt/local/etc/profile.d/bash_completion.sh
 # linux
 [[ -f /etc/profile.d/bash-completion ]] && source /etc/profile.d/bash-completion
-
-[[ -f ~/dotfiles/shell/bashrc.git-completion ]] && source ~/dotfiles/shell/bashrc.git-completion
+GIT_COMPLETION=~/dotfiles/shell/bashrc.git-completion
+[[ -f $GIT_COMPLETION ]] && source $GIT_COMPLETION
 # holy hell this is slow, FIXME
 #[[ -f ~/dotfiles/shell/beaker-completion.bash ]] && source ~/dotfiles/shell/beaker-completion.bash
+RAKE_COMPLETION=/usr/local/etc/bash_completion.d/rake
+[[ -f $RAKE_COMPLETION ]] && source $RAKE_COMPLETION
+
 [[ -f ~/dotfiles/shell/aliases ]] && source ~/dotfiles/shell/aliases
 
 export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
