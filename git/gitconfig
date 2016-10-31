@@ -33,7 +33,7 @@
   resetmaster   = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
 	pick = add --patch
 	ctags = !.git/hooks/ctags
-  fixup = commit -a --amend --no-edit
+  fixup = commit --amend --no-edit
   whathaveidone = diff HEAD@{1}..HEAD
 [merge]
 	tool = gvimdiff
