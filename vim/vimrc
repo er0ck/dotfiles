@@ -210,20 +210,20 @@ set noautochdir " force macvim to not set working dir to current file
 " ,cd to chdir to the path of the current file, then pwd
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 
-" The Silver Searcher
-if executable('ag')
+if executable('ag') " The Silver Searcher
   " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
-
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
+  " Note we extract the column as well as the file and line number
+  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
+  set grepformat=%f:%l:%c%m
+  " set :ag to grep, but silent; open cwindow
+  " lame, must start with caps
+  " search files, open quicksearch, redraw
+  command! -nargs=+ -complete=file_in_path -bar Ag silent grep! <args>|cwindow|redraw!
 endif
-
-" bind K to grep word under cursor
-nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+" search open buffers with :Bag blah
+" holy hell this is a pain
+" search across buffers, close the bufdo opened windows, open quicksearch, redraw
+command! -nargs=+ -bar Bag let currBuff=bufnr("%") | call setqflist([]) | silent bufdo vimgrepadd! <args> % | only |cwindow|redraw!
 
 " cursor shape based on mode
 if exists('$TMUX')
