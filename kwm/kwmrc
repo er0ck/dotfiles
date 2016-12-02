@@ -12,8 +12,9 @@ kwmc config center-on-float on
 kwmc config float-non-resizable on
 kwmc config lock-to-container on
 kwmc config cycle-focus on
-kwmc config mouse-drag on
-kwmc config mouse-drag mod shift
+// these two break shift and cmd-click selections
+//kwmc config mouse-drag on
+//kwmc config mouse-drag mod shift
 kwmc config optimal-ratio 1.605
 
 kwmc config border focused on

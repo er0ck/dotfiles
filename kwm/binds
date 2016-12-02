@@ -56,9 +56,9 @@ kwmc bindsym MODE_MANAGER-f space -fExperimental previous
 kwmc bindsym MODE_MANAGER+shift-z window -m space left ; space -fExperimental left
 kwmc bindsym MODE_MANAGER+shift-c window -m space right ; space -fExperimental right
 
-kwmc bindsym MODE_MANAGER+shift-1 display -f 0
-kwmc bindsym MODE_MANAGER+shift-2 display -f 1
-kwmc bindsym MODE_MANAGER+shift-3 display -f 2
+/*kwmc bindsym MODE_MANAGER+shift-1 display -f 0*/
+/*kwmc bindsym MODE_MANAGER+shift-2 display -f 1*/
+/*kwmc bindsym MODE_MANAGER+shift-3 display -f 2*/
 
 /*
 TODO: Create new binds
@@ -104,9 +104,9 @@ kwmc bindsym SWAP_MODE-5 window -m space 5
 kwmc bindsym SWAP_MODE-z window -m space left
 kwmc bindsym SWAP_MODE-c window -m space right
 
-kwmc bindsym SWAP_MODE+shift-1 window -m display 0
-kwmc bindsym SWAP_MODE+shift-2 window -m display 1
-kwmc bindsym SWAP_MODE+shift-3 window -m display 2
+/*kwmc bindsym SWAP_MODE+shift-1 window -m display 0*/
+/*kwmc bindsym SWAP_MODE+shift-2 window -m display 1*/
+/*kwmc bindsym SWAP_MODE+shift-3 window -m display 2*/
 
 
 /* binds for mode SPACE_MODE */
