@@ -1,0 +1,15 @@
+#!/bin/sh
+# eg: $1 == PUP-1234
+# requires a .netrc file with creds all up in it
+
+# we encode the URL with python because curl's --data-urlencode breaks down with '=' in the encoded data
+#   in addition, it appears that jira doesn't work with curl --data passed to its search/ endpoint
+# FIXME: this will silently return no results when not auth'd against a private repo
+#   eg: when there is no .netrc file
+_QUERY=`python -c "import urllib; values = {'jql': 'Team=\"${1}\" AND Status=\"${2}\"'}; print urllib.urlencode(values)"`
+curl --silent --show-error --header "Content-Type: application/json" --netrc --request GET --url "https://tickets.puppetlabs.com/rest/api/2/search/?${_QUERY}" | python -c 'import sys, json; issues_list = json.load(sys.stdin)["issues"];
+for issue in issues_list: print issue["key"]'
+#curl --silent --show-error --header "Content-Type: application/json" --netrc --request GET --url "https://tickets.puppetlabs.com/rest/api/2/search/?${_QUERY}" | python -c 'import sys, json; print json.load(sys.stdin)["issues"][0]["key"]'
+
+
+

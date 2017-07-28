@@ -1,0 +1,19 @@
+#!/bin/sh
+# eg: $1 == PUP-1234
+# requires a .netrc file with creds all up in it
+
+# we encode the URL with python because curl's --data-urlencode breaks down with '=' in the encoded data
+#   in addition, it appears that jira doesn't work with curl --data passed to its search/ endpoint
+# FIXME: this will silently return no results when not auth'd against a private repo
+#   eg: when there is no .netrc file
+_OPEN_PULLS=$(curl --silent --show-error --header "Accept: Content-Type: application/vnd.github.v3+json" --netrc --request GET --url "https://api.github.com/repos/puppetlabs/puppet/pulls" | python -c 'import sys, json; pulls_list = json.load(sys.stdin);
+for pull in pulls_list: print (str(pull["number"]) + ": " + pull["title"] + ": " + pull["base"]["ref"] + ": " + pull["head"]["sha"] + "\\n").encode("utf-8")')
+
+_CLOSED_PULLS=$(curl --silent --show-error --header "Accept: Content-Type: application/vnd.github.v3+json" --netrc --request GET --url "https://api.github.com/repos/puppetlabs/puppet/pulls?state=closed" | python -c 'import sys, json; pulls_list = json.load(sys.stdin);
+for pull in pulls_list: print((str(pull["number"]) + ": " + pull["title"] + ": " + pull["base"]["ref"] + ": " + pull["head"]["sha"] + "\\n").encode("utf-8"))')
+
+_CLOSED_PULLS="${_CLOSED_PULLS}$(curl --silent --show-error --header "Accept: Content-Type: application/vnd.github.v3+json" --netrc --request GET --url "https://api.github.com/repos/puppetlabs/puppet/pulls?state=closed&page=2" | python -c 'import sys, json; pulls_list = json.load(sys.stdin);
+for pull in pulls_list: print((str(pull["number"]) + ": " + pull["title"] + ": " + pull["base"]["ref"] + ": " + pull["head"]["sha"] + "\\n").encode("utf-8"))')"
+echo ${_OPEN_PULLS} | grep -i 'PUP-7431'
+echo '*************************************************************'
+echo ${_CLOSED_PULLS} | grep -i 'PUP-7431'
