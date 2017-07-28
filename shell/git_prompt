@@ -1,7 +1,7 @@
 # bash/zsh git prompt support
 #
 # Copyright (C) 2006,2007 Shawn O. Pearce <spearce@spearce.org>
-# Distributed under the GNU General Public License, version 2.0.
+
 #
 # This script allows you to see repository status in your prompt.
 #
@@ -86,7 +86,7 @@
 # using __git_ps1 for PROMPT_COMMAND or precmd.
 
 # check whether printf supports -v
-__git_printf_supports_v=
+__git_printf_supports_v=yes
 printf -v __git_printf_supports_v -- '%s' yes >/dev/null 2>&1
 
 # stores the divergence from upstream in $p

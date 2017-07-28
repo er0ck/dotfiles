@@ -17,6 +17,9 @@ case $_myos in
 		/usr/bin/keychain $HOME/.ssh/github_rsa
 	  source $HOME/.keychain/$HOSTNAME-sh
     ;;
+  Darwin)
+    ssh-add -A
+    ;;
   *) ;;
 esac
 
@@ -38,106 +41,37 @@ else
 fi
 export DISPLAY
 
-# Load in the git branch prompt script.
-[ -f ~/dotfiles/shell/git_prompt  ] && source ~/dotfiles/shell/git_prompt
+__GIT_PROMPT_DIR=$(brew --prefix)/opt/bash-git-prompt/share
+source "${__GIT_PROMPT_DIR}/prompt-colors.sh"
+RUBY_PROMPT='{$(~/.rvm/bin/rvm-prompt i v)}'
 
-export GIT_PS1_SHOWCOLORHINTS=true
-export GIT_PS1_SHOWDIRTYSTATE=true
-export GIT_PS1_SHOWSTASHSTATE=true
-export GIT_PS1_SHOWUNTRACKEDFILES=true
-export GIT_PS1_SHOWUPSTREAM="auto"
-set_prompt () {
-  Last_Command=$? # Must come first!
-  BOLD=""
-  RESET=""
-  BASE03=""
-  BASE02=""
-  BASE01=""
-  BASE00=""
-  BASE0=""
-  BASE1=""
-  BASE2=""
-  BASE3=""
-  YELLOW=""
-  ORANGE=""
-  RED=""
-  MAGENTA=""
-  VIOLET=""
-  BLUE=""
-  CYAN=""
-  GREEN=""
-  local HOSTSTYLE=""
-  local USERSTYLE=""
-  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
-      BASE03=$(tput setaf 234)
-      BASE02=$(tput setaf 235)
-      BASE01=$(tput setaf 240)
-      BASE00=$(tput setaf 241)
-      BASE0=$(tput setaf 244)
-      BASE1=$(tput setaf 245)
-      BASE2=$(tput setaf 254)
-      BASE3=$(tput setaf 230)
-      YELLOW=$(tput setaf 136)
-      ORANGE=$(tput setaf 166)
-      RED=$(tput setaf 160)
-      MAGENTA=$(tput setaf 125)
-      VIOLET=$(tput setaf 61)
-      BLUE=$(tput setaf 33)
-      CYAN=$(tput setaf 37)
-      GREEN=$(tput setaf 64)
-    else
-      BASE03=$(tput setaf 8)
-      BASE02=$(tput setaf 0)
-      BASE01=$(tput setaf 10)
-      BASE00=$(tput setaf 11)
-      BASE0=$(tput setaf 12)
-      BASE1=$(tput setaf 14)
-      BASE2=$(tput setaf 7)
-      BASE3=$(tput setaf 15)
-      YELLOW=$(tput setaf 3)
-      ORANGE=$(tput setaf 9)
-      RED=$(tput setaf 1)
-      MAGENTA=$(tput setaf 5)
-      VIOLET=$(tput setaf 13)
-      BLUE=$(tput setaf 4)
-      CYAN=$(tput setaf 6)
-      GREEN=$(tput setaf 2)
-    fi
-    BOLD=$(tput bold)
-    RESET=$(tput sgr0)
-    FancyX='\342\234\227'
-    Checkmark='\342\234\223'
+# non-git prompt stuff
+PS1=""
+# If it was successful, print a green check mark. Otherwise, print
+# a red X.
+if [[ $? == 0 ]]; then
+    PS1+="${Green}✔ "
+else
+    PS1+="${Red}✘ "
+fi
+# If root, just print the host in red. Otherwise, print the current user
+# and host in green.
+if [[ $EUID == 0 ]]; then
+    PS1+="${Red}\\u@\\h "
+else
+    PS1+="${Green}\\u@\\h "
+fi
+# Print the working directory and prompt marker in blue, and reset
+# the text color to the default.
+PS1+="${Blue}\\w ${Cyan}${RUBY_PROMPT} "
+PS1+="${ResetColor}$ "
 
-    # Add a bright white exit status for the last command
-    #PS1="$White\$? "
-    PS1=""
-    # If it was successful, print a green check mark. Otherwise, print
-    # a red X.
-    if [[ $Last_Command == 0 ]]; then
-        PS1+="\[$GREEN\]$Checkmark "
-    else
-        PS1+="\[$RED\]$FancyX "
-    fi
-    # If root, just print the host in red. Otherwise, print the current user
-    # and host in green.
-    if [[ $EUID == 0 ]]; then
-        PS1+="\[$RED\]\\h "
-    else
-        PS1+="\[$GREEN\]\\u@\\h "
-    fi
-    # Print the working directory and prompt marker in blue, and reset
-    # the text color to the default.
-    PS1+="\[$BLUE\]\\w" 
-    GIT=$(__git_ps1)
-    if (( ${#GIT} > 15 )); then
-      PS1+="\n\[$RESET\]\$(__git_ps1)\\\$ "
-    else
-      PS1+="\[$RESET\]\$(__git_ps1)\\\$ "
-    fi
-  fi
-}
-PROMPT_COMMAND='set_prompt'
+GIT_PROMPT_ONLY_IN_REPO=1
+GIT_PROMPT_FETCH_REMOTE_STATUS=1
+GIT_PROMPT_THEME=Custom # use .git-prompt-colors.sh as theme
+GIT_PROMPT_SHOW_UNTRACKED_FILES=normal
+
+source "${__GIT_PROMPT_DIR}/gitprompt.sh"
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
