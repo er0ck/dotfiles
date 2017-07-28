@@ -147,42 +147,38 @@ echo $first$second
 }
 
 # get latest agent sha given component branch name
-get_latest_sha() {
-  if [ $# -lt 1 ]; then
-    echo "get_latest_sha <project> branch"
-    echo "where branch is one of manual, master, stable, or aardwolf"
-    echo "where project is optional and is one of puppet, hiera, facter, puppet_agent_daily, or mco"
-    return 1
-  fi
-  if [ $# -gt 1 ]; then
-    BRANCH_NAME=$2
-    PROJECT_NAME=$1
-  else
-    PROJECT_NAME='puppet'
+passing_sha() {
+  if [ $# -gt 0 ]; then
     BRANCH_NAME=$1
+  else
+    BRANCH_NAME='master'
   fi
-  #https://jenkins.puppetlabs.com/view/puppet-agent/view/stable/view/puppet/job/platform_puppet_pkg-van-promote_stable/lastSuccessfulBuild/
-  JENKINS_URL='jenkins.puppetlabs.com/view/puppet-agent/view'
-  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_COMMIT"}["value"]'
+  JENKINS_URL='jenkins-master-prod-1.delivery.puppetlabs.net/view/puppet-agent/view'
+  SUCCESSFUL=`shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/Suite/job/platform_puppet-agent_intn-van-promote_suite-daily-promotion-${BRANCH_NAME}/lastSuccessfulBuild/api/json`
+  if [ $# -gt 1 ]; then
+    COMPONENT=$2
+    if [ $COMPONENT = "puppetdb" ]; then
+      INDEX='0'
+      if [ $BRANCH_NAME = 'stable' ]; then INDEX='1'; fi
+      JENKINS_URL='cinext-jenkinsmaster-enterprise-prod-1.delivery.puppetlabs.net/view/puppetdb/view'
+      SUCCESSFUL=`shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/job/enterprise_puppetdb_integration-system-puppetdb_full-${BRANCH_NAME}/lastSuccessfulBuild/api/json`
+      echo $SUCCESSFUL | ruby -e "require 'json'; puts JSON.parse(STDIN.read)['actions'][${INDEX}]['parameters'].find{|x| x['name'] == 'PUPPETDB_PACKAGE_BUILD_VERSION'}['value']"
+    else
+      echo $SUCCESSFUL | ruby -e "require 'json'; puts JSON.parse(STDIN.read)['actions'][0]['parameters'].find{|x| x['name'] == '${COMPONENT}_COMPONENT_COMMIT'}['value']"
+    fi
+  else
+    echo $SUCCESSFUL | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_COMMIT"}["value"]'
+  fi
 }
 
-get_latest_version() {
-  if [ $# -lt 1 ]; then
-    echo "get_latest_version <project> branch"
-    echo "where branch is one of manual, master, stable, or aardwolf"
-    echo "where project is optional and is one of puppet, hiera, facter, puppet_agent_daily, or mco"
-    return 1
-  fi
-  if [ $# -gt 1 ]; then
-    BRANCH_NAME=$2
-    PROJECT_NAME=$1
-  else
-    PROJECT_NAME='puppet'
+passing_version() {
+  if [ $# -gt 0 ]; then
     BRANCH_NAME=$1
+  else
+    BRANCH_NAME='master'
   fi
-  #https://jenkins.puppetlabs.com/view/puppet-agent/view/stable/view/puppet/job/platform_puppet_pkg-van-promote_stable/lastSuccessfulBuild/
-  JENKINS_URL='jenkins.puppetlabs.com/view/puppet-agent/view'
-  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/${PROJECT_NAME}/job/platform_puppet_pkg-van-promote_${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_VERSION"}["value"]'
+  JENKINS_URL='jenkins-master-prod-1.delivery.puppetlabs.net/view/puppet-agent/view'
+  shhcurl --url https://${JENKINS_URL}/${BRANCH_NAME}/view/Suite/job/platform_puppet-agent_intn-van-promote_suite-daily-promotion-${BRANCH_NAME}/lastSuccessfulBuild/api/json | ruby -e 'require "json"; puts JSON.parse(STDIN.read)["actions"][0]["parameters"].find{|x| x["name"] == "SUITE_VERSION"}["value"]'
 }
 
 get_latest_shas() {
