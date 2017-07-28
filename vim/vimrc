@@ -13,23 +13,38 @@ set nocompatible      " We're running Vim, not Vi!
 syntax on             " Enable syntax highlighting
 filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
-filetype plugin on    " Enable filetype-specific plugins"
+filetype plugin on    " Enable filetype-specific plugins
+set omnifunc=syntaxcomplete#Complete
 
 " don't care about modula2; set all *.md as markdown
 autocmd BufRead,BufNewFile *.md set filetype=markdown
-autocmd BufRead,BufNewFile *.md setlocal spell
+autocmd Filetype markdown setlocal spell
+
 " moar ruby
 autocmd BufRead,BufNewFile Rakefile,Gemfile,Vagrantfile,*.gemspec set filetype=ruby
+" macro @p inserts a pry breakpoint
+let @p = "0Orequire 'pry'; binding.pry="
 " Set up puppet manifest and spec options
 autocmd BufNewFile,BufReadPost *.pp set filetype=puppet
-" turn on spelling for git commit messages
-autocmd FileType gitcommit setlocal spell
+" turn on spelling for commit messages
+autocmd FileType *commit* setlocal spell
 
 " disable arrow keys in escape mode
 map <up> <nop>
 map <down> <nop>
 map <left> <nop>
 map <right> <nop>
+
+" RSpec.vim mappings
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
+map <Leader>a :call RunAllSpecs()<CR>
+let g:rspec_command = "Dispatch rspec {spec}"
+
+set wildmode=list:longest   "make cmdline tab completion similar to bash
+set wildmenu                "enable ctrl-n and ctrl-p to scroll thru matches
+set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
 
 " no more shift!
 nnoremap ; :
@@ -40,66 +55,75 @@ map Y y$
 " complete lists generated from buffers, and tags
 set complete=".,b,u,]"
 set completeopt=longest,menuone
-"let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
-"autocmd FileType ruby let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
-autocmd FileType ruby let g:SuperTabDefaultCompletionType = "context"
-"autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
-autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
-autocmd Filetype ruby setlocal omnifunc=rubycomplete#Complete
+autocmd FileType ruby set omnifunc=rubycomplete#Complete
+autocmd FileType ruby let g:rubycomplete_buffer_loading=1
+autocmd FileType ruby let g:rubycomplete_classes_in_global=1
 autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
 " Move up and down in autocomplete with <c-j> and <c-k>
 inoremap <expr> <c-j> ("\<C-n>")
 inoremap <expr> <c-k> ("\<C-p>")
-
-"if has("autocmd") && exists("+omnifunc")
-  "autocmd Filetype *
-        "\ if &omnifunc == "" |
-        "\   setlocal omnifunc=syntaxcomplete#Complete |
-        "\ endif
-"endif
-
-let @p = "0Orequire 'pry'; binding.pry="
 
 " speling
 set spelllang=en_us
 nmap <silent> <leader>s :set spell!<CR>
 
 " syntastic syntax checking
-let g:syntastic_ruby_checkers          = ['rubocop']
-"let g:syntastic_ruby_checkers          = ['rubocop', 'mri']
-"let g:syntastic_check_on_open=1
-let g:syntastic_check_on_wq = 0  " don't check on quit
-"let g:syntastic_enable_signs=1
-let g:syntastic_error_symbol = "✗"
-let g:syntastic_style_error_symbol = "s✗"
-let g:syntastic_warning_symbol = "⚠"
+let g:syntastic_ruby_checkers        = ['rubocop']
+let g:syntastic_javascript_checkers  = ['jshint']
+let g:syntastic_check_on_wq          = 0  " don't check on quit
+let g:syntastic_error_symbol         = "✘"
+let g:syntastic_style_error_symbol   = "s✘"
+let g:syntastic_warning_symbol       = "⚠"
 let g:syntastic_style_warning_symbol = "s⚠"
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
 
 " theme
 set background=dark
-let g:solarized_termtrans=1
-let g:solarized_termcolors=256
+let g:solarized_termtrans  = 1
+let g:solarized_termcolors = 256
 colorscheme solarized
+
+" Show PASTE if in paste mode
+let g:airline_detect_paste=1
+" glyphs for statusbar to be like powerline >
+let g:airline_powerline_fonts = 1
+" Show airline for tabs too
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme='solarized'
+" show git changes
+let g:airline#extensions#hunks#enabled = 1
+" define the set of text to display for each mode.
+let g:airline_mode_map = {
+    \ '__' : '-',
+    \ 'n'  : 'N',
+    \ 'i'  : 'I',
+    \ 'R'  : 'R',
+    \ 'c'  : 'C',
+    \ 'v'  : 'V',
+    \ 'V'  : 'V',
+    \ 's'  : 'S',
+    \ 'S'  : 'S',
+    \ }
+
+" turn off filename/bufferline in statusbar, it's in the tab bar above, but
+" not whole path
+" let g:airline_section_c = ''
+" display a warning if fileformat isnt unix
+" FIXME: this doesn't quite work
+"let g:airline_section_y="%#warningmsg# %{&ff!='unix'?'['.&ff.']':''} %*"
+""display a warning if file encoding isnt utf-8
+"let g:airline_section_y+=%#warningmsg#
+"let g:airline_section_y+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
+"let g:airline_section_y+=%*
+let g:airline_section_y=''
 
 " Shortcut to rapidly toggle `set list` to show hidden chars
 nmap <leader>l :set list!<CR>
-" Use the same symbols as TextMate for tabstops and EOLs
-" i use highlighting instead, below
-"set listchars=tab:▸\ ,eol:¬"
 
 "Hide abandon buffers in order to not lose undo history.
 "hides buffers instead of closing them
 set hidden
-" autosave buffers when switching buffers
-"set autowrite
-" use w!! if you forgot to sudo before opening a file.  dangerous?
-cmap w!! w !sudo tee % >/dev/null
 set noerrorbells " No noise.
-set mousehide " hide mouse after typing
+set mousehide    " hide mouse after typing
 if has("gui_running")
   if has("gui_gtk2")
     set guifont=Inconsolata\ 12
@@ -145,8 +169,21 @@ nnoremap <Space> za
 set splitbelow
 set splitright
 
-set tags+=./tags,tags;
-set tags+=~/repos/er0ck/*/.git/tags
+"----- xolox/vim-easytags settings -----
+" Where to look for tags files
+set tags=./.git/tags
+set tags+=~/.vim/tags
+set tags+=~/projects/beaker/.git/tags
+" Sensible defaults
+"let g:easytags_events = ['BufReadPost', 'BufWritePost']
+let g:easytags_async = 1
+let g:easytags_dynamic_files = 1
+let g:easytags_resolve_links = 1
+let g:easytags_suppress_ctags_warning = 1
+
+" ----- majutsushi/tagbar settings -----
+" Open/close tagbar with \b
+nmap <silent> <leader>b :TagbarToggle<CR>
 
 " map F2 key to paste-mode toggle and set status
 nnoremap <F2> :set invpaste paste?<CR>
@@ -156,15 +193,8 @@ set pastetoggle=<F2>
 " ii to exit insert mode
 :imap ii <Esc>
 
-" dont use Q for Ex mode
-"map Q :q
-"map q :q
-
-" show line nums, etc
-"set ruler
 " always show statusbar
 set laststatus=2
-set statusline+=%<%f\ %h%m%r\ %y%=%{v:register}\ %-14.(%l,%c%V%)\ %P
 " show linenumbers on left
 set number
 " start searching before enter
@@ -172,24 +202,17 @@ set incsearch
 set ignorecase " case insensitive search.  affects matching
 set smartcase " use case sensitive when caps used
 set hlsearch  " highlight search
-nmap <silent> ,/ :nohlsearch<CR> " clear search highlights
-" alt left and right for buffer up/dn
-:nmap <M-left> :bprev<CR>
-:nmap <M-right> :bnext<CR>
+nnoremap <silent> <leader>/ :nohlsearch<CR> " clear search highlights
 
 " vimdiff settings
 " fill in space btwn lines to align buffers:
 set diffopt=filler
 " ignore whitespace
 set diffopt+=iwhite
-map <C-n> :NERDTreeToggle<CR> " ctrl-n for nerdtree
 
 " setup hilight colorscheme for whitespace
 highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-"autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-"match ExtraWhitespace /\s\+$/  " Show trailing whitespace
 match ExtraWhitespace /\s\+\%#\@<!$/
-"match ExtraWhitespace /\t/  " Show tabs
 
 " StripTrailingWhitespaces and hotkey
 " from: Drew Neil (@nelstrom)
@@ -210,6 +233,7 @@ set noautochdir " force macvim to not set working dir to current file
 " ,cd to chdir to the path of the current file, then pwd
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 
+" search current dir with :ag
 if executable('ag') " The Silver Searcher
   " Use ag over grep
   " Note we extract the column as well as the file and line number
@@ -218,12 +242,11 @@ if executable('ag') " The Silver Searcher
   " set :ag to grep, but silent; open cwindow
   " lame, must start with caps
   " search files, open quicksearch, redraw
-  command! -nargs=+ -complete=file_in_path -bar Ag silent grep! <args>|cwindow|redraw!
+  command! -nargs=+ -complete=file_in_path -bar Ag call setqflist([]) | silent grep! <args>|cwindow|redraw!
 endif
 " search open buffers with :Bag blah
-" holy hell this is a pain
 " search across buffers, close the bufdo opened windows, open quicksearch, redraw
-command! -nargs=+ -bar Bag let currBuff=bufnr("%") | call setqflist([]) | silent bufdo vimgrepadd! <args> % | only |cwindow|redraw!
+command! -nargs=+ -bar Bag call setqflist([]) | silent bufdo vimgrepadd! <args> % |only|cwindow|redraw!
 
 " cursor shape based on mode
 if exists('$TMUX')
