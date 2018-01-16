@@ -47,8 +47,9 @@ alias git_get_head='git rev-parse HEAD'
 alias git_get_remote_head='git ls-remote upstream HEAD'
 alias git_changed_tests_csv='git diff --name-only --relative upstream/master | grep tests/ | tr "\r\n" ","'
 alias git=hub
-
 alias shhcurl="curl --silent --show-error"
+alias docker_clean_images='docker rmi $(docker images -a --filter=dangling=true -q)'
+alias docker_clean_ps='docker rm $(docker ps --filter=status=exited --filter=status=created -q)'
 
 # move file and symlink to it from og position
 function lmv(){ [ -e "$1" -a -e "$2" ] && mv "$1" "$2" && ln -s "$2/$(basename $1)" "$(dirname $1)"; }
@@ -107,13 +108,13 @@ showvm() {
   fi
 }
 
-HOST_PATTERN='[0-9a-z]{15}(\.delivery\.puppetlabs\.net)?'
+HOST_PATTERN='[^\s]+(\.delivery\.puppetlabs\.net|amazonaws\.com)+'
 ROLE_PATTERN='\((?!speed,).*?\)'
 WIN_PATTERN='\swindows-\d\d\d\d'
 # TODO: if no roles set in sut.log but only one hosts, just use that one...
 #    if asking for master or database log us into the first one
 sshvm() {
-  HOSTNAME=`showvm | grep $1 | head -1 | ack -oh  "$HOST_PATTERN" | head -n 1`
+  HOSTNAME=`showvm | grep $1 | ack -o --no-filename -1 "$HOST_PATTERN"`
   # find out if we're asking to login to a windows host
   USERNAME='root'
   showvm | ack -oh "$WIN_PATTERN[^\r\n]*$HOSTNAME" &>/dev/null && USERNAME='Administrator'
@@ -121,9 +122,9 @@ sshvm() {
   # if the host resolves, log us in, otherwise we're asking for a role
   #   the role resolved to a hostname in HOSTNAME var above
   if ! host $1 > /dev/null 2>&1; then
-    ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$HOSTNAME "${@:2}"
+    ssh -A -Y -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$HOSTNAME "${@:2}"
   else
-    ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$1 "${@:2}"
+    ssh -A -Y -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa-acceptance $USERNAME@$1 "${@:2}"
   fi
 }
 
