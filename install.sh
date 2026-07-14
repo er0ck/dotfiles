@@ -15,13 +15,13 @@ create_symlink() {
   ln -s $ABSOLUTE_PATH/$1 $HOME/.$BASENAME
 }
 
-FILES=(bin git/gitconfig rubocop.yml pryrc shell/bash_profile shell/bashrc shell/inputrc shell/rvm_profile vim vim/vimrc)
+FILES=(bin git/gitconfig rubocop.yml pryrc shell/zshrc shell/zprofile shell/bash_profile shell/bashrc shell/inputrc shell/rvm_profile vim vim/vimrc)
 
 for i in ${FILES[@]}; do
   backup_file ${i}
   create_symlink ${i}
 done
 
-source $HOME/.bash_profile
+echo "done. open a new shell (or 'exec zsh') to pick up the new config."
 
 exit 0
