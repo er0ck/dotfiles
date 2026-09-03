@@ -12,6 +12,7 @@ export PATH="$HOME/.local/bin:$PATH"
 export EDITOR=vim
 export VISUAL=vim
 export MANPAGER='less -X'
+export AWS_PROFILE=sso
 
 # History
 HISTFILE=~/.zsh_history
@@ -126,6 +127,58 @@ precmd() {
   print -Pn '\e]0;%~\a'   # set terminal title to cwd
 }
 
+component_report () {
+  set -o pipefail
+  local report
+  report=$(
+    curl -X 'GET' -fsS "https://production-internal.activestate.build/sv/dynamic-imports/view/${1:?pass the version identifier}" -H 'accept: application/json' |
+    jq -r '
+      ( [ .assets[] | select(.ecosystem_uri | endswith(".tar.gz") or endswith(".tgz") or endswith(".zip") or test("\\d\\.jar$")) | (.activestate_uri | split("/") | last) ]) as $srcs
+      | .assets[]
+      | select(.ecosystem_uri | startswith("probe://"))
+      | select((.ecosystem_uri | split("/") | last) as $p | $srcs | index($p))
+      | .activestate_uri
+    ' |
+    sed -E 's#https://([^.]+)\.s3\.[^/]+\.amazonaws\.com/#s3://\1/#'
+  )
+  aws s3 cp ${report:?no malcontent scan} - | jq
+}
+
+component_block () {
+    case $1 in
+      view|lift)
+        ;;
+      *)
+        echo 'specify either "block view" or "block lift"'; return;;
+    esac
+    local info
+    info=$(curl -X 'GET' -fsS "https://production-internal.activestate.build/sv/dynamic-imports/filters/${2:?pass the version identifier}" -H 'accept: application/json')
+    if [[ "$1" == 'view' ]]; then
+      jq <<< "$info"; return
+    fi
+    curl -X 'DELETE' -fsS "https://production-internal.activestate.build/sv/dynamic-imports/filters/${2}" -H 'Content-Type: application/json' -d "$(jq -r '.filters' <<< "$info")" >/dev/null
+  }
+
+component_ingest () {
+  local req id info
+  req=$(sed -E 's#^([^/]+)/(.*)/([^/]+)$#{"action": {"action": "discover-evaluate", "ecosystem": "\1", "package": "\2", "version": "\3"}}#' <<< "${1:?pass the version identifier}")
+  id=$(
+    curl -X 'POST' -fsS 'https://production-internal.activestate.build/sv/dynamic-imports/jobs' -H 'Content-Type: application/json' -d "$req" |
+    jq -r '.job_id'
+  )
+  while :; do
+    info=$(curl -X 'GET' -fsS "https://production-internal.activestate.build/sv/dynamic-imports/jobs/${id}" -H 'accept: application/json')
+    if [[ "$(jq -r '.status' <<< "$info")" != 'started' ]]; then break; fi
+    sleep 4
+    printf '.'
+  done
+  if [[ "$(jq -r '.status' <<< "$info")" == 'succeeded' ]]; then
+    printf "got\n"
+  else
+    printf "$(jq -r '.status' <<< "$info")\n$(jq -r '.message' <<< "$info")\n"
+  fi
+}
+
 # zsh's %m expands the hostname with no length control, so precompute a
 # truncated one instead (hostname doesn't change mid-session).
 _host_short="${HOST:0:9}"
@@ -134,3 +187,12 @@ PROMPT=$'\n''%(?.%F{green}✔%f.%F{red}✘%f) '
 PROMPT+="${_user_color}%n%f@${_host_color}${_host_short}%f: %F{green}%~%f"
 PROMPT+='${vcs_info_msg_0_}'
 PROMPT+=$'\n''%F{white}$%f '
+# -- START ACTIVESTATE INSTALLATION
+export PATH="/Users/ericthompson/.cache/asbazel/output/external/+tools+state_tool_binary/files/bin:$PATH"
+# -- STOP ACTIVESTATE INSTALLATION
+# -- START ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT
+export PATH="/Users/ericthompson/Library/Caches/activestate/bin:$PATH"
+if [[ ! -z "$ACTIVESTATE_ACTIVATED" && -f "$ACTIVESTATE_ACTIVATED/activestate.yaml" ]]; then
+  echo "State Tool is operating on project $ACTIVESTATE_ACTIVATED_NAMESPACE, located at $ACTIVESTATE_ACTIVATED"
+fi
+# -- STOP ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT

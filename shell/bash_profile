@@ -82,3 +82,12 @@ source "${__GIT_PROMPT_DIR}/gitprompt.sh"
 # MacPorts Installer addition on 2016-05-19_at_14:55:35: adding an appropriate PATH variable for use with MacPorts.
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 # Finished adapting your PATH environment variable for use with MacPorts.
+# -- START ACTIVESTATE INSTALLATION
+export PATH="/Users/ericthompson/.cache/asbazel/output/external/+tools+state_tool_binary/files/bin:$PATH"
+# -- STOP ACTIVESTATE INSTALLATION
+# -- START ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT
+export PATH="/Users/ericthompson/Library/Caches/activestate/bin:$PATH"
+if [[ ! -z "$ACTIVESTATE_ACTIVATED" && -f "$ACTIVESTATE_ACTIVATED/activestate.yaml" ]]; then
+  echo "State Tool is operating on project $ACTIVESTATE_ACTIVATED_NAMESPACE, located at $ACTIVESTATE_ACTIVATED"
+fi
+# -- STOP ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT
