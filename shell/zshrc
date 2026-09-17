@@ -1,0 +1,161 @@
+# zshrc — interactive zsh config
+#
+# Developer-oriented, colored, git-aware prompt with ZERO external
+# dependencies: no starship, no plugin manager. Everything here ships
+# with zsh itself, aside from one optional local, untracked include
+# for machine-specific/internal-employer helpers (see bottom).
+
+# Bail out early for non-interactive shells (scp/rcp etc.)
+[[ -o interactive ]] || return
+
+export PATH="$HOME/.local/bin:$PATH"
+
+export EDITOR=vim
+export VISUAL=vim
+export MANPAGER='less -X'
+export AWS_PROFILE=sso
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+setopt HIST_VERIFY
+setopt APPEND_HISTORY
+
+# cd by typing a bare directory name
+setopt AUTO_CD
+
+# Type a command prefix, then Up/Down cycles only through history entries
+# that start with it (cursor lands at end-of-line so typing/repeating just
+# works). Built into zsh, no plugin needed.
+autoload -Uz history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey "^[[A" history-beginning-search-backward-end
+bindkey "^[[B" history-beginning-search-forward-end
+
+# Completion
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# Colors for ls/grep (BSD ls on macOS uses CLICOLOR + LSCOLORS)
+export CLICOLOR=1
+export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
+alias ls='ls -F'
+alias ll='ls -lAhG'
+alias la='ls -AG'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias grep='grep --color=auto'
+alias g='git'
+alias gs='git status'
+alias gd='git diff'
+alias gl='git log --oneline --graph --decorate'
+
+# symlink one or more Claude skills from your projects dir into the
+# current project's .claude/skills/, so Claude Code discovers them locally.
+#   cslink <skill-name> [skill-name...]
+CLAUDE_SKILLS_ROOTS=("$HOME/local_documents/projects"/*/skills)
+
+cslink() {
+  if [[ $# -eq 0 ]]; then
+    echo "usage: cslink <skill-name> [skill-name...]" >&2
+    return 1
+  fi
+
+  mkdir -p .claude/skills
+
+  local name root src matches
+  for name in "$@"; do
+    matches=()
+    for root in "${CLAUDE_SKILLS_ROOTS[@]}"; do
+      [[ -d "$root/$name" ]] && matches+=("$root/$name")
+    done
+
+    case ${#matches[@]} in
+      0) echo "cslink: no skill named '$name' found under ${CLAUDE_SKILLS_ROOTS[*]}" >&2 ;;
+      1)
+        src=${matches[1]}
+        ln -sfn "$src" ".claude/skills/$name"
+        echo "linked $src -> .claude/skills/$name"
+        ;;
+      *)
+        echo "cslink: '$name' is ambiguous, found in:" >&2
+        printf '  %s\n' "${matches[@]}" >&2
+        ;;
+    esac
+  done
+}
+
+# ── Prompt ────────────────────────────────────────────────────────────
+# Built-in vcs_info replaces the old bash-git-prompt tap and the 145-line
+# bash_prompt script. Layout mirrors the old bash prompt:
+#
+#   ✔ user@host: ~/path on <branch> +!?
+#   $
+#
+# where + = staged, ! = unstaged, ? = untracked, and ✔/✘ reflects the
+# last command's exit status.
+
+autoload -Uz vcs_info
+setopt PROMPT_SUBST
+
+zstyle ':vcs_info:*'         enable git
+zstyle ':vcs_info:git:*'     check-for-changes true
+zstyle ':vcs_info:git:*'     stagedstr   ' %F{green}+%f'
+zstyle ':vcs_info:git:*'     unstagedstr ' %F{yellow}!%f'
+zstyle ':vcs_info:git:*'     formats       ' on %F{cyan}%b%f%c%u'
+zstyle ':vcs_info:git:*'     actionformats ' on %F{cyan}%b%f|%F{red}%a%f%c%u'
+
+# Add a '?' when there are untracked files.
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
++vi-git-untracked() {
+  if [[ -n $(git ls-files --others --exclude-standard 2>/dev/null) ]]; then
+    hook_com[unstaged]+=' %F{red}?%f'
+  fi
+}
+
+# root and ssh sessions get a red user/host as a warning.
+if (( EUID == 0 )); then
+  _user_color='%F{red}'
+else
+  _user_color='%F{yellow}'
+fi
+if [[ -n $SSH_TTY ]]; then
+  _host_color='%F{red}'
+else
+  _host_color='%F{yellow}'
+fi
+
+precmd() {
+  vcs_info
+  print -Pn '\e]0;%~\a'   # set terminal title to cwd
+}
+
+# zsh's %m expands the hostname with no length control, so precompute a
+# truncated one instead (hostname doesn't change mid-session).
+_host_short="${HOST:0:9}"
+
+PROMPT=$'\n''%(?.%F{green}✔%f.%F{red}✘%f) '
+PROMPT+="${_user_color}%n%f@${_host_color}${_host_short}%f: %F{green}%~%f"
+PROMPT+='${vcs_info_msg_0_}'
+PROMPT+=$'\n''%F{white}$%f '
+# libpq's PATH export moved to zshenv — this file doesn't run for the
+# non-interactive shells (make preflight, Bazel, agents) that actually need it.
+# -- START ACTIVESTATE INSTALLATION
+export PATH="/Users/ericthompson/.cache/asbazel/output/external/+tools+state_tool_binary/files/bin:$PATH"
+# -- STOP ACTIVESTATE INSTALLATION
+# -- START ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT
+export PATH="/Users/ericthompson/Library/Caches/activestate/bin:$PATH"
+if [[ ! -z "$ACTIVESTATE_ACTIVATED" && -f "$ACTIVESTATE_ACTIVATED/activestate.yaml" ]]; then
+  echo "State Tool is operating on project $ACTIVESTATE_ACTIVATED_NAMESPACE, located at $ACTIVESTATE_ACTIVATED"
+fi
+# -- STOP ACTIVESTATE DEFAULT RUNTIME ENVIRONMENT
+
+# machine-specific/internal-employer helpers that shouldn't live in a
+# public repo (e.g. internal DB/API access). Never tracked, never pushed.
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
