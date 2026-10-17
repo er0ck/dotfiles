@@ -59,3 +59,14 @@ acceptance/log
 Session.vim
 .netrwhist
 *~
+
+# Agent scratch #
+#################
+# Design notes from the superpowers brainstorming/planning skills, and the
+# subagent-driven-development workspace. Working notes for the change in
+# flight, never a record a repo needs to keep.
+docs/superpowers/
+.superpowers/
+
+# Claude Code per-machine local settings, never shared.
+**/.claude/settings.local.json
