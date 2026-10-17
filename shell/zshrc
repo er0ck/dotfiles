@@ -159,3 +159,6 @@ fi
 # machine-specific/internal-employer helpers that shouldn't live in a
 # public repo (e.g. internal DB/API access). Never tracked, never pushed.
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# gh as the account matching the repo's origin SSH host alias (see agent-skills/git-ssh-and-identity)
+alias ghr=~/local_documents/projects/agent-skills/git-ssh-and-identity/gh-repo
