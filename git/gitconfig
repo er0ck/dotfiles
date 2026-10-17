@@ -3,17 +3,23 @@
 	smudge = git-media-smudge %f
 [user]
 	name = Eric Thompson
-	email = eric.thompson@puppetlabs.com
+	email = 7454093+er0ck@users.noreply.github.com
+
+# repos whose remote uses the ActiveState SSH host alias (see
+# ~/.ssh/config) pick up the work identity instead. Path is untracked,
+# machine-local, created per-machine (not part of this repo).
+[includeIf "hasconfig:remote.*.url:git@github.com-activestate:*/**"]
+	path = ~/.gitconfig-activestate
 [color]
   # color opts: normal, black, red, green, yellow, blue, magenta, cyan, or white
   ui = auto
   interactive = auto
 [core]
-	excludesfile = ~/dotfiles/git/gitignore_global
+	excludesfile = ~/local_documents/projects/dotfiles/git/gitignore_global
 	whitespace = trailing-space,space-before-tab
 	autocrlf = input
 [init]
-	templatedir = ~/dotfiles/git/git_template
+	templatedir = ~/local_documents/projects/dotfiles/git/git_template
 [alias]
   br = branch
   ci = commit -v
