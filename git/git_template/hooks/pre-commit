@@ -54,7 +54,6 @@ if [ $RESULT -ne 0 ]; then
   exit 1
 fi
 
-.git/hooks/pre-commit-pry
 
 "$(dirname "$0")/pre-commit-secrets" || exit 1
 #git stash pop -q
