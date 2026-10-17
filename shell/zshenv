@@ -1,0 +1,11 @@
+# zshenv — sourced by every zsh invocation, interactive or not, login or not.
+#
+# zshrc bails out early for non-interactive shells (see its own header), so
+# anything a tool needs on PATH (not just a human at a terminal) belongs here
+# instead: make preflight, Bazel actions, agent shells, cron, IDE run configs.
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# libpq is keg-only (avoids fighting a full postgresql install), so psql isn't
+# on PATH by default.
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
